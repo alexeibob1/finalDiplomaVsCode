@@ -1,0 +1,13 @@
+<template>
+    <lightning-card title="Статус процесса заселения">
+        <div class="slds-m-around_medium">
+            <lightning-input type="toggle"
+                label="Разрешить подачу заявок на проживание"
+                checked={isActive}
+                onchange={handleToggle}
+                message-toggle-active="Разрешена"
+                message-toggle-inactive="Запрещена">
+            </lightning-input>
+        </div>
+    </lightning-card>
+</template>
