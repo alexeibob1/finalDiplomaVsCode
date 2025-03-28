@@ -1,6 +1,12 @@
 <template>
     <lightning-card title="Статус процесса заселения">
         <div class="slds-m-around_medium">
+            <template if:true={isLoading}>
+                <div class="slds-align_absolute-center">
+                    <lightning-spinner alternative-text="Загрузка..." size="small"></lightning-spinner>
+                </div>
+            </template>
+
             <lightning-input type="toggle"
                 label="Разрешить подачу заявок на проживание"
                 checked={isActive}
@@ -8,6 +14,12 @@
                 message-toggle-active="Разрешена"
                 message-toggle-inactive="Запрещена">
             </lightning-input>
+
+            <template if:true={error}>
+                <div class="slds-m-top_small slds-text-color_error">
+                    ⚠ {error}
+                </div>
+            </template>
         </div>
     </lightning-card>
 </template>
