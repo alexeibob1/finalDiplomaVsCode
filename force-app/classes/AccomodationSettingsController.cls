@@ -21,6 +21,7 @@ public without sharing class AccomodationSettingsController implements Metadata.
             Id jobId = Metadata.Operations.enqueueDeployment(mdContainer, callback);
         } catch (Exception e) {
             LOGGER.error('Error when enabling accomodation: ' + e.getMessage());
+            LOGGER.saveLog();
             throw new AccomodationSettingException(e);
         }
     }
@@ -37,6 +38,8 @@ public without sharing class AccomodationSettingsController implements Metadata.
         } else {
             LOGGER.error('Error when enabling accomodation. Check Deployment Status for details');
         }
+
+        LOGGER.saveLog();
     }
 
     @AuraEnabled
