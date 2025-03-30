@@ -3,6 +3,7 @@ import isRequestSubmissionAvailable from '@salesforce/apex/AccomodationRequestCo
 import isRegistrationAvailable from '@salesforce/apex/AccomodationRequestController.isRegistrationAvailable';
 import createAccommodationRequest from '@salesforce/apex/AccomodationRequestController.createAccommodationRequest';
 import Toast from 'lightning/toast';
+import ConfirmationModal from 'c/confirmationModal';
 
 export default class PortalSubmitAccomodationRequestBtn extends LightningElement {
     error = undefined;
@@ -10,11 +11,27 @@ export default class PortalSubmitAccomodationRequestBtn extends LightningElement
     isRegistrationAvailable = false;
     isRequestSubmissionAvailable = false;
 
+    showModal = false;
+
     connectedCallback() {
         this.checkButtonAvailability();
     }
 
-    async handleRequest() {
+    async handleClick() {
+        const result = await ConfirmationModal.open({
+            size: 'medium',
+            title: 'Подтверждение заявки',
+            message: 'Вы уверены, что хотите подать заявку на проживание?',
+            confirmLabel: 'Подтвердить',
+            cancelLabel: 'Отмена'
+        });
+
+        if (result) {
+            this.processRequest();
+        }
+    }
+
+    async processRequest() {
         this.dispatchEvent(new CustomEvent('loading', { detail: { isLoading: true } }));
         try {
             await createAccommodationRequest();
@@ -27,6 +44,7 @@ export default class PortalSubmitAccomodationRequestBtn extends LightningElement
             this.error = error.body.message;
             this.showToast('Ошибка', 'Произошла ошибка', 'error');
         } finally {
+            this.closeModal();
             this.dispatchEvent(new CustomEvent('loading', { detail: { isLoading: false } }));
         }
     }
@@ -43,5 +61,13 @@ export default class PortalSubmitAccomodationRequestBtn extends LightningElement
     @api
     get isButtonDisabled() {
         return !this.isRegistrationAvailable || !this.isRequestSubmissionAvailable;
+    }
+
+    openModal() {
+        this.showModal = true;
+    }
+
+    closeModal() {
+        this.showModal = false;
     }
 }

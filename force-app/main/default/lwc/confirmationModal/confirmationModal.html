@@ -1,0 +1,8 @@
+<template>
+    <lightning-modal-header label={title}></lightning-modal-header>
+    <lightning-modal-body> {message} </lightning-modal-body>
+    <lightning-modal-footer>
+        <lightning-button label={cancelLabel} onclick={handleCancel}></lightning-button>
+        <lightning-button label={confirmLabel} onclick={handleConfirm}></lightning-button>
+    </lightning-modal-footer>
+</template>
