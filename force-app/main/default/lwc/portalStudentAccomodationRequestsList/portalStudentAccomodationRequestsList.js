@@ -2,14 +2,14 @@ import { LightningElement, api } from 'lwc';
 import getStudentRequests from '@salesforce/apex/AccomodationRequestController.getStudentRequests';
 
 const COLUMNS = [
-    { label: 'Номер заявки', fieldName: 'Name', type: 'text' },
-    { label: 'Дата создания', fieldName: 'CreatedDate', type: 'date', 
+    { label: 'Номер заявки', fieldName: 'Name', sortable: false },
+    { label: 'Дата создания', fieldName: 'CreatedDate', type: 'date', sortable: false,
         typeAttributes: { 
             year: "numeric", month: "long", day: "2-digit",
             hour: "2-digit", minute: "2-digit"
         }
     },
-    { label: 'Статус', fieldName: 'Status__c', type: 'text' }
+    { label: 'Статус', fieldName: 'Status__c', sortable: false }
 ];
 
 export default class PortalStudentAccomodationRequestsList extends LightningElement {

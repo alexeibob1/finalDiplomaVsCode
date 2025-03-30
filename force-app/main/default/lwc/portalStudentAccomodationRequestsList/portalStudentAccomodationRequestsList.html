@@ -10,7 +10,12 @@
             key-field="Id"
             data={requests}
             columns={columns}
-            hide-checkbox-column="true">
+            hide-checkbox-column="true"
+            column-widths-mode="fixed"  
+            suppress-bottom-bar="true"  
+            class="custom-datatable"
+            resize-column-disabled
+        >
         </lightning-datatable>
     </template>
 

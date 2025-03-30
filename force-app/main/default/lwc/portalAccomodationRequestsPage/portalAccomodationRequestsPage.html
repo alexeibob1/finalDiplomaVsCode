@@ -5,14 +5,18 @@
         </div>
     </template>
 
-    <c-portal-submit-accomodation-request-btn
-        onloading={handleLoading}
-        onrequestcreated={handleRequestCreated}
-    >
-    </c-portal-submit-accomodation-request-btn>
+    <lightning-layout multiple-rows="true" class="slds-m-around_medium">
+        <lightning-layout-item size="12" class="slds-m-bottom_medium">
+            <c-portal-submit-accomodation-request-btn
+                onloading={handleLoading}
+                onrequestcreated={handleRequestCreated}>
+            </c-portal-submit-accomodation-request-btn>
+        </lightning-layout-item>
 
-    <c-portal-student-accomodation-requests-list
-        onloading={handleLoading}
-    >
-    </c-portal-student-accomodation-requests-list>
+        <lightning-layout-item size="12">
+            <c-portal-student-accomodation-requests-list
+                onloading={handleLoading}>
+            </c-portal-student-accomodation-requests-list>
+        </lightning-layout-item>
+    </lightning-layout>
 </template>
