@@ -1,0 +1,13 @@
+<template>
+    <lightning-button 
+        label="Подать заявку на проживание"
+        variant="brand"
+        onclick={handleRequest}>
+    </lightning-button>
+
+    <template if:true={error}>
+        <div class="slds-m-top_small slds-text-color_error">
+            ⚠ {error}
+        </div>
+    </template>
+</template>

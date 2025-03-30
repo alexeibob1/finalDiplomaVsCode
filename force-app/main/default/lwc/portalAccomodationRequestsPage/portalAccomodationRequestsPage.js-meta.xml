@@ -2,7 +2,7 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>63.0</apiVersion>
     <isExposed>true</isExposed>
-    <masterLabel>Student Accomodation Request Button</masterLabel>
+    <masterLabel>Portal Student Accomodation Requests Page</masterLabel>
     <targets>
         <target>lightningCommunity__Page</target>
     </targets>
