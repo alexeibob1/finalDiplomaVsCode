@@ -27,6 +27,32 @@ public with sharing class AccomodationRequestController {
             throw new AccomodationRequestException('Error creating request: ' + e.getMessage());
         }
     }
+    
+    @AuraEnabled(cacheable=true)
+    public static List<Accomodation_Request__c> getStudentRequests() {
+        try {
+            Id contactId = [SELECT ContactId FROM User WHERE Id = :UserInfo.getUserId()].ContactId;
+            if (contactId == null) {
+                throw new AccomodationRequestException('Contact not found for the logged-in user.');
+            }
+
+            Account studentAccount = [SELECT Id FROM Account WHERE PersonContactId = :contactId LIMIT 1];
+            if (studentAccount == null) {
+                throw new AccomodationRequestException('No associated Person Account found.');
+            }
+
+            return [
+                SELECT Id, Name, CreatedDate, Status__c, Room__c
+                FROM Accomodation_Request__c
+                WHERE Student__c = :studentAccount.Id
+                ORDER BY CreatedDate DESC
+            ];
+        } catch (Exception e) {
+            LOGGER.error('Error fetching student requests: ' + e.getMessage());
+            LOGGER.saveLog();
+            throw new AccomodationRequestException('Error fetching student requests.');
+        }
+    }
 
     public class AccomodationRequestException extends Exception {}
 }
