@@ -1,4 +1,4 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, api } from 'lwc';
 import getStudentRequests from '@salesforce/apex/AccomodationRequestController.getStudentRequests';
 
 const COLUMNS = [
@@ -22,6 +22,7 @@ export default class PortalStudentAccomodationRequestsList extends LightningElem
         this.fetchRequests();
     }
 
+    @api
     async fetchRequests() {
         this.dispatchEvent(new CustomEvent('loading', { detail: { isLoading: true } })); 
 

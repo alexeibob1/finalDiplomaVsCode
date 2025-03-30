@@ -10,6 +10,7 @@ export default class PortalSubmitAccomodationRequestBtn extends LightningElement
         try {
             await createAccommodationRequest();
             this.showToast('Успешно', 'Заявка успешно подана', 'success');
+            this.dispatchEvent(new CustomEvent('requestcreated'));
             this.error = undefined;
         } catch (error) {
             this.error = error.body.message;

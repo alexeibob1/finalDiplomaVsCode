@@ -28,7 +28,7 @@ public with sharing class AccomodationRequestController {
         }
     }
     
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static List<Accomodation_Request__c> getStudentRequests() {
         try {
             Id contactId = [SELECT ContactId FROM User WHERE Id = :UserInfo.getUserId()].ContactId;
