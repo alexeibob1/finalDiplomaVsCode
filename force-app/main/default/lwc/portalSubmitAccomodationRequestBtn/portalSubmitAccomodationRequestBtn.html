@@ -1,9 +1,19 @@
 <template>
-    <lightning-button 
-        label="Подать заявку на проживание"
-        variant="brand"
-        onclick={handleRequest}>
-    </lightning-button>
+    <template lwc:if={isButtonDisabled}>
+        <lightning-button 
+            label="Подать заявку на проживание"
+            variant="brand"
+            onclick={handleRequest}
+            disabled>
+        </lightning-button>
+    </template>
+    <template lwc:else>
+        <lightning-button 
+            label="Подать заявку на проживание"
+            variant="brand"
+            onclick={handleRequest}>
+        </lightning-button>
+    </template>
 
     <template if:true={error}>
         <div class="slds-m-top_small slds-text-color_error">
