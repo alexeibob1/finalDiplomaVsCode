@@ -10,9 +10,15 @@ export default class PortalAccomodationRequestsPage extends LightningElement {
 
     handleRequestCreated() {
         const requestList = this.template.querySelector('c-portal-student-accomodation-requests-list');
-        console.log('requestLine elem', requestList);
         if (requestList) {
             requestList.fetchRequests();
+        }
+    }
+
+    handleRequestCancelled() {
+        const requestBtn = this.template.querySelector('c-portal-submit-accomodation-request-btn');
+        if (requestBtn) {
+            requestBtn.checkButtonAvailability();
         }
     }
 }

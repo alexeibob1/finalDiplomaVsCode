@@ -53,6 +53,7 @@ export default class PortalSubmitAccomodationRequestBtn extends LightningElement
         Toast.show({ label, message, variant, mode: 'dismissible' });
     }
 
+    @api
     async checkButtonAvailability() {
         this.isRegistrationAvailable = await isRegistrationAvailable();
         this.isRequestSubmissionAvailable = await isRequestSubmissionAvailable();

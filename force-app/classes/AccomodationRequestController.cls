@@ -92,5 +92,23 @@ public with sharing class AccomodationRequestController {
         return studentAccount;
     }
 
+    @AuraEnabled
+    public static void cancelRequest(Id requestId) {
+        try {
+            Accomodation_Request__c request = [
+                SELECT Id, Status__c FROM Accomodation_Request__c WHERE Id = :requestId LIMIT 1
+            ];
+
+            if (request.Status__c == 'Canceled') {
+                throw new AccomodationRequestException('Заявка уже отменена.');
+            }
+
+            request.Status__c = 'Canceled';
+            update request;
+        } catch (Exception e) {
+            throw new AccomodationRequestException(e.getMessage());
+        }
+    }
+
     public class AccomodationRequestException extends Exception {}
 }
