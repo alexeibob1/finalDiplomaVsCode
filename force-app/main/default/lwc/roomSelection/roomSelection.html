@@ -1,0 +1,18 @@
+<template>
+    <lightning-card title="Выбор комнаты">
+        <div class="slds-m-around_medium">
+            <lightning-datatable
+                key-field="Id"
+                data={rooms}
+                columns={columns}
+                hide-checkbox-column
+                onrowaction={handleRowSelection}
+            ></lightning-datatable>
+
+            <div class="slds-m-top_medium slds-text-align_center">
+                <lightning-button label="Назад" onclick={previousPage} disabled={disablePrev}></lightning-button>
+                <lightning-button label="Вперед" onclick={nextPage} disabled={disableNext} class="slds-m-left_small"></lightning-button>
+            </div>
+        </div>
+    </lightning-card>
+</template>
