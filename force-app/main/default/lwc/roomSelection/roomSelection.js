@@ -4,6 +4,7 @@ import getTotalRoomsCount from '@salesforce/apex/RoomSelectionController.getTota
 import getStudent from '@salesforce/apex/StudentDAO.getAccountByAccomodationRequestId';
 import updateAccomodationRequestRoom from '@salesforce/apex/AccomodationRequestController.updateAccomodationRequestRoom';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
 
 const COLUMNS = [
     { label: 'Комната', fieldName: 'roomUrl', type: 'url', 
@@ -95,6 +96,7 @@ export default class RoomSelection extends LightningElement {
             );
 
             await this.reloadData(); // Refresh the table
+            notifyRecordUpdateAvailable([{recordId: this.recordId}]);
         } catch (error) {
             this.dispatchEvent(
                 new ShowToastEvent({
