@@ -5,7 +5,7 @@ public with sharing class RoomSelectionController {
 
         // Query child rooms (rooms that have a parent)
         Map<Id, Room__c> childRooms = new Map<Id, Room__c>([
-            SELECT Id, Name, Available_Places__c, Sex__c, Dormitory__r.Name 
+            SELECT Id, Name, Available_Places__c, Capacity__c, Sex__c, Dormitory__r.Name 
             FROM Room__c 
             WHERE Parent_Room__c != NULL 
             AND (Sex__c = :studentGender OR Sex__c = NULL) 
@@ -19,7 +19,7 @@ public with sharing class RoomSelectionController {
         List<Room__c> parentRooms = new List<Room__c>();
         if (remaining > 0) {
             parentRooms = [
-                SELECT Id, Name, Available_Places__c, Sex__c, Dormitory__r.Name 
+                SELECT Id, Name, Available_Places__c, Capacity__c, Sex__c, Dormitory__r.Name 
                 FROM Room__c 
                 WHERE Parent_Room__c = NULL 
                 AND Id NOT IN :childRooms.keySet()

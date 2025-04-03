@@ -7,52 +7,62 @@ const COLUMNS = [
     { label: 'Комната', fieldName: 'Name' },
     { label: 'Общежитие', fieldName: 'DormitoryName' },
     { label: 'Свободных мест', fieldName: 'Available_Places__c', type: 'number' },
+    { label: 'Вместимость', fieldName: 'Capacity__c', type: 'number' },
     { type: 'button', typeAttributes: { label: 'Выбрать', name: 'select', variant: 'brand' } }
 ];
 
 export default class RoomSelection extends LightningElement {
     @api recordId;
-
-    studentRecord = null;
-
     @track rooms = [];
     columns = COLUMNS;
     
+    studentRecord = null;
     pageNumber = 1;
     pageSize = 10;
     totalRooms = 0;
+    isLoading = false;
 
     async connectedCallback() {
-        console.log('recordId', this.recordId);
-        await this.fetchStudent();
-        await this.loadRooms();
+        await this.reloadData();
     }
 
     async fetchStudent() {
+        this.isLoading = true;
         try {
             this.studentRecord = await getStudent({ requestId: this.recordId });
-            console.log('student', this.studentRecord);
         } catch (error) {
             console.error(error);
+        } finally {
+            this.isLoading = false;
         }
     }
 
     async loadRooms() {
         if (!this.studentRecord) return;
-        
+
+        this.isLoading = true;
         try {
             const studentGender = this.studentRecord.PersonContact.Sex__c;
             this.totalRooms = await getTotalRoomsCount({ studentGender });
-            console.log('total rooms', this.totalRooms);
             this.rooms = (await getAvailableRooms({ studentGender, pageNumber: this.pageNumber, pageSize: this.pageSize }))
                 .map(room => ({
                     ...room,
                     DormitoryName: room.Dormitory__r?.Name || 'Не указано'
                 }));
-
-            console.log('rooms', this.rooms);
         } catch (error) {
             console.error('Error loading rooms:', error);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    async reloadData() {
+        this.isLoading = true;
+        try {
+            await this.fetchStudent();
+            await this.loadRooms();
+        } finally {
+            this.isLoading = false;
         }
     }
 
