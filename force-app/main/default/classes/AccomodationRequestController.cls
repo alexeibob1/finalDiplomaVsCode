@@ -110,5 +110,22 @@ public with sharing class AccomodationRequestController {
         }
     }
 
+    @AuraEnabled
+    public static void updateAccomodationRequestRoom(Id requestId, Id roomId) {
+        try {
+            Accomodation_Request__c request = [
+                SELECT Id, Room__c 
+                FROM Accomodation_Request__c 
+                WHERE Id = :requestId 
+                LIMIT 1
+            ];
+            
+            request.Room__c = roomId;
+            update request;
+        } catch (Exception e) {
+            throw new AccomodationRequestException('Error updating request room: ' + e.getMessage());
+        }
+    }
+
     public class AccomodationRequestException extends Exception {}
 }

@@ -2,10 +2,16 @@ import { LightningElement, api, track } from 'lwc';
 import getAvailableRooms from '@salesforce/apex/RoomSelectionController.getAvailableRooms';
 import getTotalRoomsCount from '@salesforce/apex/RoomSelectionController.getTotalRoomsCount';
 import getStudent from '@salesforce/apex/StudentDAO.getAccountByAccomodationRequestId';
+import updateAccomodationRequestRoom from '@salesforce/apex/AccomodationRequestController.updateAccomodationRequestRoom';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 const COLUMNS = [
-    { label: 'Комната', fieldName: 'Name' },
-    { label: 'Общежитие', fieldName: 'DormitoryName' },
+    { label: 'Комната', fieldName: 'roomUrl', type: 'url', 
+      typeAttributes: { label: { fieldName: 'Name' }, target: '_blank' } },
+
+    { label: 'Общежитие', fieldName: 'dormitoryUrl', type: 'url', 
+      typeAttributes: { label: { fieldName: 'DormitoryName' }, target: '_blank' } },
+
     { label: 'Свободных мест', fieldName: 'Available_Places__c', type: 'number' },
     { label: 'Вместимость', fieldName: 'Capacity__c', type: 'number' },
     { type: 'button', typeAttributes: { label: 'Выбрать', name: 'select', variant: 'brand' } }
@@ -47,6 +53,8 @@ export default class RoomSelection extends LightningElement {
             this.rooms = (await getAvailableRooms({ studentGender, pageNumber: this.pageNumber, pageSize: this.pageSize }))
                 .map(room => ({
                     ...room,
+                    roomUrl: `/${room.Id}`,  // Create URL for Room__c
+                    dormitoryUrl: room.Dormitory__r ? `/${room.Dormitory__r.Id}` : '', // Create URL for Dormitory (Account)
                     DormitoryName: room.Dormitory__r?.Name || 'Не указано'
                 }));
         } catch (error) {
@@ -66,9 +74,39 @@ export default class RoomSelection extends LightningElement {
         }
     }
 
-    handleRowSelection(event) {
+    async handleRowSelection(event) {
         const selectedRoomId = event.detail.row.Id;
-        this.dispatchEvent(new CustomEvent('roomselected', { detail: { roomId: selectedRoomId } }));
+
+        if (!this.recordId) {
+            console.error('No request ID provided.');
+            return;
+        }
+
+        this.isLoading = true;
+        try {
+            await updateAccomodationRequestRoom({ requestId: this.recordId, roomId: selectedRoomId });
+            
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Успех',
+                    message: 'Комната успешно выбрана!',
+                    variant: 'success'
+                })
+            );
+
+            await this.reloadData(); // Refresh the table
+        } catch (error) {
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Ошибка',
+                    message: 'Ошибка при выборе комнаты: ' + error.body.message,
+                    variant: 'error'
+                })
+            );
+            console.error(error);
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     get disablePrev() {
