@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Month_Duty__c</fullName>
+    <label>Дежурство на месяц</label>
+    <referenceTo>Month_Duty__c</referenceTo>
+    <relationshipLabel>Смены дежурств на месяц</relationshipLabel>
+    <relationshipName>Month_Duties</relationshipName>
+    <relationshipOrder>0</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <trackTrending>false</trackTrending>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

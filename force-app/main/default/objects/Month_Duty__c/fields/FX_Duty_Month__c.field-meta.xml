@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FX_Duty_Month__c</fullName>
+    <externalId>false</externalId>
+    <formula>CASE(MONTH(Duty_Month_Year__c), 
+ 1, &quot;Январь&quot;, 
+ 2, &quot;Февраль&quot;, 
+ 3, &quot;Март&quot;,  
+ 4, &quot;Апрель&quot;, 
+ 5, &quot;Май&quot;,  
+ 6, &quot;Июнь&quot;, 
+ 7, &quot;Июль&quot;, 
+ 8, &quot;Август&quot;, 
+ 9, &quot;Сентябрь&quot;, 
+ 10, &quot;Октябрь&quot;, 
+ 11, &quot;Ноябрь&quot;, 
+ 12, &quot;Декабрь&quot;, 
+ &quot;Неверное значение&quot;)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Месяц дежурства</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

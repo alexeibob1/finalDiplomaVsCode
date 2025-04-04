@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Parent_Room__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Используется для создания вложенности блоков в комнату</description>
+    <label>Родительская комната</label>
+    <referenceTo>Room__c</referenceTo>
+    <relationshipLabel>Комнаты</relationshipLabel>
+    <relationshipName>Child_Rooms</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

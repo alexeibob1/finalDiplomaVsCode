@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Work_Type__c</fullName>
+    <label>Тип работы</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Мытье окон</fullName>
+                <default>false</default>
+                <label>Мытье окон</label>
+            </value>
+            <value>
+                <fullName>Мытье стен</fullName>
+                <default>false</default>
+                <label>Мытье стен</label>
+            </value>
+            <value>
+                <fullName>Мытье пола</fullName>
+                <default>false</default>
+                <label>Мытье пола</label>
+            </value>
+            <value>
+                <fullName>Мытье дверей</fullName>
+                <default>false</default>
+                <label>Мытье дверей</label>
+            </value>
+            <value>
+                <fullName>Мытье мебели</fullName>
+                <default>false</default>
+                <label>Мытье мебели</label>
+            </value>
+            <value>
+                <fullName>Мытье лестниц</fullName>
+                <default>false</default>
+                <label>Мытье лестниц</label>
+            </value>
+            <value>
+                <fullName>Чистка ковров</fullName>
+                <default>false</default>
+                <label>Чистка ковров</label>
+            </value>
+            <value>
+                <fullName>Покраска</fullName>
+                <default>false</default>
+                <label>Покраска</label>
+            </value>
+            <value>
+                <fullName>Погрузка белья</fullName>
+                <default>false</default>
+                <label>Погрузка белья</label>
+            </value>
+            <value>
+                <fullName>Вынос мусора</fullName>
+                <default>false</default>
+                <label>Вынос мусора</label>
+            </value>
+            <value>
+                <fullName>Уборка листьев</fullName>
+                <default>false</default>
+                <label>Уборка листьев</label>
+            </value>
+            <value>
+                <fullName>Подметание двора</fullName>
+                <default>false</default>
+                <label>Подметание двора</label>
+            </value>
+            <value>
+                <fullName>Уборка снега</fullName>
+                <default>false</default>
+                <label>Уборка снега</label>
+            </value>
+            <value>
+                <fullName>Участие в мероприятии</fullName>
+                <default>false</default>
+                <label>Участие в мероприятии</label>
+            </value>
+            <value>
+                <fullName>Помощь воспитателю</fullName>
+                <default>false</default>
+                <label>Помощь воспитателю</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>5</visibleLines>
+</CustomField>

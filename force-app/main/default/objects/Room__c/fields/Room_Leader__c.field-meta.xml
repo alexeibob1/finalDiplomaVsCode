@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Room_Leader__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Староста комнаты</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>Account.Room__pr.Id</field>
+            <operation>equals</operation>
+            <valueField>$Source.Id</valueField>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>Account</referenceTo>
+    <relationshipLabel>Комнаты (староста)</relationshipLabel>
+    <relationshipName>Leader_Rooms</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

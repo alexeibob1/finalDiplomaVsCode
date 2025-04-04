@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Duty_Month_Year__c</fullName>
+    <inlineHelpText>Выберите любой день из месяца, для которого вы создаёте расписание дежурств</inlineHelpText>
+    <label>Месяц, год дежурства</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>
