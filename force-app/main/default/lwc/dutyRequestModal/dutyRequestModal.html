@@ -1,0 +1,51 @@
+<template>
+    <lightning-modal-header label="Выбор смен и дат"></lightning-modal-header>
+
+    <lightning-modal-body>
+        <template if:true={isLoading}>
+            <div class="slds-align_absolute-center">
+                <lightning-spinner alternative-text="Загрузка..." size="medium"></lightning-spinner>
+            </div>
+        </template>
+
+        <template if:false={isLoading}>
+            <div class="slds-text-body_regular">
+                <p>Выберите до 5 смен в течение месяца.</p>
+                <div class="table-scroll">
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <template for:each={shifts} for:item="shift">
+                                    <th key={shift.Id}>{shift.Duty_Shift__r.Name}</th>
+                                </template>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={calendarData} for:item="row">
+                                <tr key={row.dateStr}>
+                                    <td>{row.dateStr}</td>
+                                    <template for:each={row.shiftCells} for:item="cell">
+                                        <td key={cell.shiftId}>
+                                            <lightning-input type="checkbox"
+                                                             checked={cell.checked}
+                                                             data-date={row.date}
+                                                             data-shift-id={cell.shiftId}
+                                                             onchange={handleCheckboxChange}
+                                                             disabled={cell.disabled}></lightning-input>
+                                        </td>
+                                    </template>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </template>
+    </lightning-modal-body>
+
+    <lightning-modal-footer>
+        <lightning-button label="Отмена" onclick={handleCancel}></lightning-button>
+        <lightning-button variant="brand" label="Отправить" onclick={handleSubmit} class="slds-m-left_small"></lightning-button>
+    </lightning-modal-footer>
+</template>
