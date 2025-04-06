@@ -11,6 +11,7 @@
                 key-field="Id"
                 data={duties}
                 columns={columns}
+                onrowaction={handleRowAction}
                 hide-checkbox-column="true">
             </lightning-datatable>
 
@@ -29,5 +30,13 @@
                 </lightning-button-group>
             </div>
         </lightning-card>
+    </template>
+
+    <template if:true={showModal}>
+        <c-duty-request-modal
+            student-id={accountId}
+            month-duty-id={selectedMonthDutyId}
+            onclose={closeModal}>
+        </c-duty-request-modal>
     </template>
 </template>

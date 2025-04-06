@@ -3,11 +3,19 @@ import getCurrentUserAccount from '@salesforce/apex/StudentDAO.getCurrentUserAcc
 import getAvailableMonthDuties from '@salesforce/apex/DutyController.getAvailableMonthDuties';
 import getAvailableMonthDutiesCount from '@salesforce/apex/DutyController.getAvailableMonthDutiesCount';
 
+const actions = [
+    { label: 'Записаться', name: 'apply' }
+];
+
 const COLUMNS = [
     { label: 'Месяц', fieldName: 'FX_Duty_Month__c' },
     { label: 'Год', fieldName: 'FX_Duty_Year__c' },
     { label: 'Этаж', fieldName: 'Floor__c', type: 'number' },
-    { label: 'Регистрация активна', fieldName: 'Is_Registration_Active__c', type: 'boolean' }
+    { label: 'Регистрация активна', fieldName: 'Is_Registration_Active__c', type: 'boolean' },
+    {
+        type: 'action',
+        typeAttributes: { rowActions : actions }
+    }
 ];
 
 export default class DutyMonthList extends LightningElement {
@@ -19,6 +27,9 @@ export default class DutyMonthList extends LightningElement {
     pageNumber = 1;
     totalDuties = 0;
     isLoading = false;
+
+    selectedMonthDutyId = null;
+    showModal = false;
 
     connectedCallback() {
         this.init();
@@ -55,7 +66,7 @@ export default class DutyMonthList extends LightningElement {
             this.totalDuties = count;
             this.duties = duties;
         } catch (e) {
-            console.error('Error loading month duties:', e);
+            console.error('Error loading duties', e);
         } finally {
             this.isLoading = false;
         }
@@ -81,5 +92,20 @@ export default class DutyMonthList extends LightningElement {
             this.pageNumber++;
             this.loadData();
         }
+    }
+
+    handleRowAction(event) {
+        const actionName = event.detail.action.name;
+        const row = event.detail.row;
+
+        if (actionName === 'apply') {
+            this.selectedMonthDutyId = row.Id;
+            this.showModal = true;
+        }
+    }
+
+    closeModal() {
+        this.showModal = false;
+        this.selectedMonthDutyId = null;
     }
 }
