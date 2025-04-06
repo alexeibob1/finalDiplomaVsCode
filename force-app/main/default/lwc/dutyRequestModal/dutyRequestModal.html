@@ -11,6 +11,14 @@
         <template if:false={isLoading}>
             <div class="slds-text-body_regular">
                 <p>Выберите до 5 смен в течение месяца.</p>
+                
+                <!-- Show warning if user already has 5 requests -->
+                <template if:true={showRequestLimitWarning}>
+                    <div class="slds-text-color_warning">
+                        <p>У вас уже есть 5 заявок на этот месяц. Вы не можете добавить больше заявок.</p>
+                    </div>
+                </template>
+
                 <div class="table-scroll">
                     <table class="slds-table slds-table_cell-buffer slds-table_bordered">
                         <thead>
@@ -23,18 +31,17 @@
                         </thead>
                         <tbody>
                             <template for:each={calendarData} for:item="row">
-                                <tr key={row.dateStr}>
-                                    <td>{row.dateStr}</td>
-                                    <template for:each={row.shiftCells} for:item="cell">
-                                        <td key={cell.shiftId}>
-                                            <lightning-input type="checkbox"
-                                                             checked={cell.checked}
-                                                             data-date={row.date}
-                                                             data-shift-id={cell.shiftId}
-                                                             onchange={handleCheckboxChange}
-                                                             disabled={cell.disabled}></lightning-input>
-                                        </td>
-                                    </template>
+                                <tr key={row.key}>
+                                    <td>{row.date}</td>
+                                    <td>
+                                        <lightning-input type="checkbox"
+                                                         checked={row.checked}
+                                                         data-date={row.date}
+                                                         data-shift-id={row.shiftId}
+                                                         onchange={handleCheckboxChange}
+                                                         disabled={row.disabled}>
+                                        </lightning-input>
+                                    </td>
                                 </tr>
                             </template>
                         </tbody>
