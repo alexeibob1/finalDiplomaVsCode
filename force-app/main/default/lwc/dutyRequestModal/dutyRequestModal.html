@@ -37,7 +37,8 @@
                                             <lightning-input
                                                 type="radio"
                                                 name="dutySelection"
-                                                data-key={cell.key}
+                                                data-date={row.date}
+                                                data-shift-id={cell.shiftId}
                                                 checked={cell.checked}
                                                 onchange={handleRadioChange}
                                                 disabled={cell.disabled}>

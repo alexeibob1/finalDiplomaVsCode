@@ -22,6 +22,7 @@ export default class DutyRequestModal extends LightningElement {
     maxRequests = 5;
     requestCount = 0;
     baseDate;
+    selectedRequest;
 
     async connectedCallback() {
         await this.loadData();
@@ -63,7 +64,7 @@ export default class DutyRequestModal extends LightningElement {
         const year = date.getFullYear();
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
         const day = date.getDate().toString().padStart(2, '0');
-        return `${day}-${month}-${year}`;
+        return `${year}-${month}-${day}`;
     }
 
     generateCalendarData(year, month) {
@@ -72,7 +73,7 @@ export default class DutyRequestModal extends LightningElement {
     
         for (let day = 1; day <= daysInMonth; day++) {
             const dateObj = new Date(year, month, day);
-            const dateISO = this.formatDateLocal(dateObj); // <-- Local formatting
+            const dateISO = this.formatDateLocal(dateObj);
     
             const row = {
                 date: dateISO,
@@ -80,9 +81,7 @@ export default class DutyRequestModal extends LightningElement {
                     const key = `${dateISO}-${shift.Id}`;
                     return {
                         key,
-                        shiftId: shift.Id,
-                        checked: this.selectedKey === key,
-                        disabled: this.existingRequests.has(key)
+                        shiftId: shift.Id
                     };
                 })
             };
@@ -93,32 +92,37 @@ export default class DutyRequestModal extends LightningElement {
     }
 
     handleRadioChange(event) {
-        const selectedKey = event.target.dataset.key;
-        this.selectedKey = selectedKey;
+        const { date, shiftId } = event.target.dataset;
         this.isSubmitDisabled = false;
-
-        // Update UI states
+    
+        this.selectedRequest = {
+            dutyDate: date,
+            dutyShiftId: shiftId
+        };
+    
+        // Update calendar UI state
         this.calendarData.forEach(row => {
             row.cells.forEach(cell => {
-                cell.checked = (cell.key === selectedKey);
+                cell.checked = (row.date === date && cell.shiftId === shiftId);
             });
         });
     }
 
     async handleSubmit() {
-        if (!this.selectedKey) {
+        if (!this.selectedRequest) {
             this.showError('Выберите смену и дату');
             return;
         }
 
-        const [dutyDate, dutyShiftId] = this.selectedKey.split('-');
+        const { dutyDate, dutyShiftId } = this.selectedRequest;
+        console.log('2', dutyDate, dutyShiftId);
 
         try {
             this.isLoading = true;
             await submitDutyRequests({
                 studentId: this.studentId,
                 monthDutyId: this.monthDutyId,
-                requests: [{ dutyDate, dutyShiftId }]
+                requests: [{ dutyDate, monthDutyShiftId: dutyShiftId }]
             });
 
             this.showSuccess('Заявка успешно отправлена');
