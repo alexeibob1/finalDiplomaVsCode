@@ -1,52 +1,57 @@
-import { api, track } from 'lwc';
-import LightningModal from 'lightning/modal';
+import { api, LightningElement, track } from 'lwc';
 import getShiftsForMonthDuty from '@salesforce/apex/DutyController.getShiftsForMonthDuty';
 import getRequestsForStudentAndMonth from '@salesforce/apex/DutyController.getRequestsForStudentAndMonth';
-import submitDutyRequests from '@salesforce/apex/DutyController.submitDutyRequests';
 import getCurrentRequestCountForMonthDuty from '@salesforce/apex/DutyController.getCurrentRequestCountForMonthDuty';
+import submitDutyRequests from '@salesforce/apex/DutyController.submitDutyRequests';
+import getMonthDutyById from '@salesforce/apex/DutyController.getMonthDutyById';
 import Toast from 'lightning/toast';
 
-export default class DutyRequestModal extends LightningModal {
-    @api monthDutyId; // Month_Duty__c ID
+export default class DutyRequestModal extends LightningElement {
+    @api monthDutyId;
     @api studentId;
 
     @track shifts = [];
-    @track selectedRequests = new Map(); // key = `${date}-${shiftId}`
-    @track existingRequests = new Set(); // to prevent duplicate selections
-    @track calendarData = []; // Internal data structure to hold day-shift states
-    @track maxRequests = 5; // Max allowed requests
-    @track requestCount = 0; // Number of requests the student already has
-    @track showRequestLimitWarning = false; // Flag to show/hide warning
-    isLoading = true;
+    @track calendarData = [];
+    @track existingRequests = new Set();
+    @track selectedKey = null;
 
-    // Fetch Month_Duty record and current requests when component is initialized
+    @track showRequestLimitWarning = false;
+    @track isSubmitDisabled = true;
+
+    isLoading = true;
+    maxRequests = 5;
+    requestCount = 0;
+    baseDate;
+
     async connectedCallback() {
         await this.loadData();
     }
 
-    // Load shifts and current requests
     async loadData() {
         this.isLoading = true;
         try {
-            const [shifts, existing, requestCount] = await Promise.all([
+            const [monthDuty, shifts, existing, count] = await Promise.all([
+                getMonthDutyById({ monthDutyId: this.monthDutyId }),
                 getShiftsForMonthDuty({ monthDutyId: this.monthDutyId }),
                 getRequestsForStudentAndMonth({ studentId: this.studentId, monthDutyId: this.monthDutyId }),
                 getCurrentRequestCountForMonthDuty({ studentAccountId: this.studentId, monthDutyId: this.monthDutyId })
             ]);
 
-            // Save data to internal state
             this.shifts = shifts;
-            this.requestCount = requestCount;
-            this.showRequestLimitWarning = this.requestCount >= this.maxRequests;
+            this.requestCount = count;
+            this.showRequestLimitWarning = count >= this.maxRequests;
 
-            // Generate calendar days and corresponding shifts
-            this.generateCalendarData(shifts);
+            // Parse base month/year from Duty_Month_Year__c (assume '2025-04' format)
+            const [year, month] = monthDuty.Duty_Month_Year__c.split('-').map(Number);
+            this.baseDate = new Date(year, month - 1); // JS months are 0-indexed
 
-            // Store existing requests to prevent duplicates
+            // Store existing requests to disable those cells
             existing.forEach(req => {
-                const key = `${req.Duty_Date__c}-${req.Duty_Shift__r?.Name || ''}`;
+                const key = `${req.Duty_Date__c}-${req.Duty_Shift__c}`;
                 this.existingRequests.add(key);
             });
+
+            this.generateCalendarData(year, month - 1);
         } catch (err) {
             this.showError('Ошибка загрузки данных: ' + (err.body?.message || err.message));
         } finally {
@@ -54,70 +59,69 @@ export default class DutyRequestModal extends LightningModal {
         }
     }
 
-    // Generate calendar data that holds the state for each day-shift combination
-    generateCalendarData(shifts) {
-        const year = new Date().getFullYear();
-        const month = new Date().getMonth();
+    formatDateLocal(date) {
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        return `${day}-${month}-${year}`;
+    }
+
+    generateCalendarData(year, month) {
         const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const rows = [];
+    
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dateObj = new Date(year, month, day);
+            const dateISO = this.formatDateLocal(dateObj); // <-- Local formatting
+    
+            const row = {
+                date: dateISO,
+                cells: this.shifts.map(shift => {
+                    const key = `${dateISO}-${shift.Id}`;
+                    return {
+                        key,
+                        shiftId: shift.Id,
+                        checked: this.selectedKey === key,
+                        disabled: this.existingRequests.has(key)
+                    };
+                })
+            };
+            rows.push(row);
+        }
+    
+        this.calendarData = rows;
+    }
 
-        this.calendarData = [];
-        
-        for (let i = 1; i <= daysInMonth; i++) {
-            const day = new Date(year, month, i).toISOString().split('T')[0]; // 'YYYY-MM-DD'
-            shifts.forEach(shift => {
-                // For each day, create an object with shift data
-                const key = `${day}-${shift.Id}`;
-                this.calendarData.push({
-                    date: day,
-                    shiftId: shift.Id,
-                    shiftName: shift.Duty_Shift__r?.Name,
-                    checked: this.selectedRequests.has(key), // Is checked
-                    disabled: this.existingRequests.has(key), // Is disabled (if already requested)
-                    key: key
-                });
+    handleRadioChange(event) {
+        const selectedKey = event.target.dataset.key;
+        this.selectedKey = selectedKey;
+        this.isSubmitDisabled = false;
+
+        // Update UI states
+        this.calendarData.forEach(row => {
+            row.cells.forEach(cell => {
+                cell.checked = (cell.key === selectedKey);
             });
-        }
+        });
     }
 
-    // Handle checkbox change (select/deselect shift)
-    handleCheckboxChange(event) {
-        const { date, shiftId } = event.target.dataset;
-        const key = `${date}-${shiftId}`;
-
-        if (this.requestCount >= this.maxRequests && event.target.checked) {
-            event.target.checked = false;
-            this.showError(`Нельзя выбрать больше ${this.maxRequests} дат.`);
-            return;
-        }
-
-        const index = this.calendarData.findIndex(item => item.key === key);
-        if (index !== -1) {
-            this.calendarData[index].checked = event.target.checked;
-            if (event.target.checked) {
-                this.selectedRequests.set(key, { dutyDate: date, dutyShiftId: shiftId });
-            } else {
-                this.selectedRequests.delete(key);
-            }
-        }
-    }
-
-    // Handle form submission
     async handleSubmit() {
-        if (this.selectedRequests.size === 0) {
-            this.showError('Выберите хотя бы одну дату');
+        if (!this.selectedKey) {
+            this.showError('Выберите смену и дату');
             return;
         }
 
-        const requests = Array.from(this.selectedRequests.values());
+        const [dutyDate, dutyShiftId] = this.selectedKey.split('-');
 
         try {
             this.isLoading = true;
             await submitDutyRequests({
                 studentId: this.studentId,
                 monthDutyId: this.monthDutyId,
-                requests: requests
+                requests: [{ dutyDate, dutyShiftId }]
             });
-            this.showSuccess('Заявки успешно отправлены');
+
+            this.showSuccess('Заявка успешно отправлена');
             this.dispatchEvent(new CustomEvent('close'));
         } catch (err) {
             this.showError(err.body?.message || err.message);
@@ -125,6 +129,8 @@ export default class DutyRequestModal extends LightningModal {
             this.isLoading = false;
         }
     }
+
+    
 
     handleCancel() {
         this.dispatchEvent(new CustomEvent('close'));
@@ -140,17 +146,5 @@ export default class DutyRequestModal extends LightningModal {
 
     showToast(label, message, variant) {
         Toast.show({ label, message, variant, mode: 'dismissible' });
-    }
-
-    // Check if the shift is already selected
-    isChecked(day, shiftId) {
-        const key = `${day}-${shiftId}`;
-        return this.selectedRequests.has(key);
-    }
-
-    // Check if the shift is disabled (already selected or not available)
-    isDisabled(day, shiftId) {
-        const key = `${day}-${shiftId}`;
-        return this.existingRequests.has(key);
     }
 }

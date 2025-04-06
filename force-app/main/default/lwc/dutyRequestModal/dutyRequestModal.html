@@ -1,23 +1,22 @@
 <template>
-    <lightning-modal-header label="Выбор смен и дат"></lightning-modal-header>
+    <lightning-modal-header label="Выбор смены и даты"></lightning-modal-header>
 
     <lightning-modal-body>
         <template if:true={isLoading}>
             <div class="slds-align_absolute-center">
-                <lightning-spinner alternative-text="Загрузка..." size="medium"></lightning-spinner>
+                <lightning-spinner size="medium" alternative-text="Загрузка..."></lightning-spinner>
             </div>
         </template>
 
         <template if:false={isLoading}>
-            <div class="slds-text-body_regular">
-                <p>Выберите до 5 смен в течение месяца.</p>
-                
-                <!-- Show warning if user already has 5 requests -->
-                <template if:true={showRequestLimitWarning}>
-                    <div class="slds-text-color_warning">
-                        <p>У вас уже есть 5 заявок на этот месяц. Вы не можете добавить больше заявок.</p>
-                    </div>
-                </template>
+            <template if:true={showRequestLimitWarning}>
+                <div class="slds-text-color_warning slds-m-bottom_medium">
+                    <p>У вас уже есть 5 заявок на этот месяц. Вы не можете добавить больше заявок.</p>
+                </div>
+            </template>
+
+            <template if:false={showRequestLimitWarning}>
+                <p class="slds-m-bottom_small">Выберите одну смену в течение месяца:</p>
 
                 <div class="table-scroll">
                     <table class="slds-table slds-table_cell-buffer slds-table_bordered">
@@ -31,28 +30,37 @@
                         </thead>
                         <tbody>
                             <template for:each={calendarData} for:item="row">
-                                <tr key={row.key}>
+                                <tr key={row.date}>
                                     <td>{row.date}</td>
-                                    <td>
-                                        <lightning-input type="checkbox"
-                                                         checked={row.checked}
-                                                         data-date={row.date}
-                                                         data-shift-id={row.shiftId}
-                                                         onchange={handleCheckboxChange}
-                                                         disabled={row.disabled}>
-                                        </lightning-input>
-                                    </td>
+                                    <template for:each={row.cells} for:item="cell">
+                                        <td key={cell.key}>
+                                            <lightning-input
+                                                type="radio"
+                                                name="dutySelection"
+                                                data-key={cell.key}
+                                                checked={cell.checked}
+                                                onchange={handleRadioChange}
+                                                disabled={cell.disabled}>
+                                            </lightning-input>
+                                        </td>
+                                    </template>
                                 </tr>
                             </template>
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </template>
         </template>
     </lightning-modal-body>
 
     <lightning-modal-footer>
         <lightning-button label="Отмена" onclick={handleCancel}></lightning-button>
-        <lightning-button variant="brand" label="Отправить" onclick={handleSubmit} class="slds-m-left_small"></lightning-button>
+        <lightning-button
+            variant="brand"
+            label="Отправить"
+            class="slds-m-left_small"
+            onclick={handleSubmit}
+            disabled={isSubmitDisabled}>
+        </lightning-button>
     </lightning-modal-footer>
 </template>
