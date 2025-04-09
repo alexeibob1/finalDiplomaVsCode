@@ -31,15 +31,20 @@ export default class MaintenanceRequestForm extends LightningElement {
         if (data) {
             this.recordTypeId = data.defaultRecordTypeId;
         }
+        if (error) {
+            console.error(error?.body?.message);
+        }
     }
 
     @wire(getPicklistValues, {
         recordTypeId: '$recordTypeId',
         fieldApiName: TYPE_FIELD
     })
-    wiredPicklist({ data }) {
+    wiredPicklist({ data, error }) {
         if (data) {
             this.typeOptions = data.values;
+        } else {
+            console.error(error?.body?.message);
         }
     }
 
@@ -50,9 +55,9 @@ export default class MaintenanceRequestForm extends LightningElement {
             this.studentId = context.studentId;
             this.dormitoryId = context.dormitoryId;
             this.gender = context.gender;
-            this.roomName = `Комната ${this.roomId?.substring(0, 8)}`;
+            this.roomName = context.roomName;
 
-            const rooms = await getRoomsForDormitory(this.dormitoryId, this.gender);
+            const rooms = await getRoomsForDormitory({dormitoryId: this.dormitoryId});
             this.roomOptions = rooms.map(room => ({
                 label: room.Name,
                 value: room.Id

@@ -4,19 +4,20 @@ public without sharing class MaintenanceRequestController {
     public static Map<String, Object> getStudentContext() {
         User currentUser = [SELECT Id, AccountId FROM User WHERE Id = :UserInfo.getUserId()];
         Account student = [
-            SELECT Id, PersonContact.Room__c, PersonContact.Room__r.Dormitory__c
+            SELECT Id, PersonContact.Room__c, PersonContact.Room__r.Dormitory__c, PersonContact.Room__r.Name
             FROM Account WHERE Id = :currentUser.AccountId
         ];
 
         return new Map<String, Object>{
             'studentId' => student.Id,
             'roomId' => student.PersonContact.Room__c,
+            'roomName' => student.PersonContact.Room__r.Name,
             'dormitoryId' => student.PersonContact.Room__r.Dormitory__c
         };
     }
 
     @AuraEnabled
-    public static List<Room__c> getRoomsForDormitory(Id dormitoryId, String gender) {
+    public static List<Room__c> getRoomsForDormitory(Id dormitoryId) {
         return [
             SELECT Id, Name
             FROM Room__c
