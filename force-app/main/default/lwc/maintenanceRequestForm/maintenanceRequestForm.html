@@ -1,0 +1,70 @@
+<template>
+    <lightning-card title="Заявка на ремонт">
+        <div class="slds-p-around_medium">
+            <lightning-combobox
+                name="type"
+                label="Тип неисправности"
+                value={type}
+                options={typeOptions}
+                onchange={handleChange}
+                required>
+            </lightning-combobox>
+
+            <lightning-textarea
+                name="description"
+                label="Описание"
+                value={description}
+                onchange={handleChange}
+                required>
+            </lightning-textarea>
+
+            <lightning-input
+                type="checkbox"
+                label="Выбрать другую комнату"
+                onchange={toggleRoomEdit}>
+            </lightning-input>
+
+            <template if:true={showRoomSelection}>
+                <lightning-combobox
+                    name="roomId"
+                    label="Комната"
+                    value={roomId}
+                    options={roomOptions}
+                    onchange={handleChange}
+                    required>
+                </lightning-combobox>
+            </template>
+
+            <template if:false={showRoomSelection}>
+                <lightning-input
+                    label="Комната"
+                    value={roomName}
+                    disabled>
+                </lightning-input>
+            </template>
+
+            <lightning-input
+                type="checkbox"
+                label="Заявка на общую зону"
+                onchange={toggleCommonArea}>
+            </lightning-input>
+
+            <template if:true={isCommonArea}>
+                <lightning-input
+                    name="commonArea"
+                    label="Общая зона"
+                    value={commonArea}
+                    onchange={handleChange}
+                    required>
+                </lightning-input>
+            </template>
+
+            <lightning-button
+                class="slds-m-top_medium"
+                variant="brand"
+                label="Отправить"
+                onclick={handleSubmit}>
+            </lightning-button>
+        </div>
+    </lightning-card>
+</template>
