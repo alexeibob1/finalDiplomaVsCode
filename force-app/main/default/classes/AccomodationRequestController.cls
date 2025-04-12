@@ -19,7 +19,7 @@ public with sharing class AccomodationRequestController {
 
             Accomodation_Request__c newRequest = new Accomodation_Request__c(
                 Student__c = studentAccount.Id,
-                Status__c = 'Submitted'
+                Status__c = 'Подана'
             );
 
             insert newRequest;
@@ -68,7 +68,7 @@ public with sharing class AccomodationRequestController {
         List<Accomodation_Request__c> requests = [
             SELECT Id, Name, CreatedDate, Status__c, Room__c
             FROM Accomodation_Request__c
-            WHERE Student__c = :studentAccount.Id AND Status__c IN ('Approved', 'Documents_Accepted', 'Submitted')
+            WHERE Student__c = :studentAccount.Id AND Status__c IN ('Одобрена', 'Документы приняты', 'Подана')
         ];
 
         if (!requests.isEmpty()) {
@@ -99,11 +99,11 @@ public with sharing class AccomodationRequestController {
                 SELECT Id, Status__c FROM Accomodation_Request__c WHERE Id = :requestId LIMIT 1
             ];
 
-            if (request.Status__c == 'Canceled') {
+            if (request.Status__c == 'Отменена') {
                 throw new AccomodationRequestException('Заявка уже отменена.');
             }
 
-            request.Status__c = 'Canceled';
+            request.Status__c = 'Отменена';
             update request;
         } catch (Exception e) {
             throw new AccomodationRequestException(e.getMessage());

@@ -11,37 +11,37 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
-                <fullName>Submitted</fullName>
+                <fullName>Подана</fullName>
                 <default>false</default>
                 <label>Подана</label>
             </value>
             <value>
-                <fullName>Documents_Accepted</fullName>
+                <fullName>Документы приняты</fullName>
                 <default>false</default>
                 <label>Документы приняты</label>
             </value>
             <value>
-                <fullName>Approved</fullName>
+                <fullName>Одобрена</fullName>
                 <default>false</default>
                 <label>Одобрена</label>
             </value>
             <value>
-                <fullName>Settled</fullName>
+                <fullName>Заселен</fullName>
                 <default>false</default>
                 <label>Заселен</label>
             </value>
             <value>
-                <fullName>Rejected</fullName>
+                <fullName>Отклонена</fullName>
                 <default>false</default>
                 <label>Отклонена</label>
             </value>
             <value>
-                <fullName>Canceled</fullName>
+                <fullName>Отменена</fullName>
                 <default>false</default>
                 <label>Отменена</label>
             </value>
             <value>
-                <fullName>Expelled</fullName>
+                <fullName>Выселен</fullName>
                 <default>false</default>
                 <label>Выселен</label>
             </value>
