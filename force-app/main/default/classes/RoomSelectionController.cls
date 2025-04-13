@@ -5,7 +5,7 @@ public with sharing class RoomSelectionController {
 
         // Query child rooms (rooms that have a parent)
         Map<Id, Room__c> childRooms = new Map<Id, Room__c>([
-            SELECT Id, Name, Available_Places__c, Capacity__c, Sex__c, Dormitory__r.Name 
+            SELECT Id, Name, Available_Places__c, Capacity__c, Sex__c, Dormitory__r.Name, Parent_Room__c 
             FROM Room__c 
             WHERE Parent_Room__c != NULL 
             AND (Sex__c = :studentGender OR Sex__c = NULL) 
@@ -13,6 +13,11 @@ public with sharing class RoomSelectionController {
             ORDER BY Available_Places__c ASC
             LIMIT :pageSize OFFSET :offset
         ]);
+
+        Set<Id> parentRoomsIds = new Set<Id>();
+        for (Room__c childRoom : childRooms.values()) {
+            parentRoomsIds.add(childRoom.Parent_Room__c);
+        }
 
         // If we don't have enough child rooms, fetch parent rooms with no children
         Integer remaining = pageSize - childRooms.keySet().size();
@@ -22,7 +27,7 @@ public with sharing class RoomSelectionController {
                 SELECT Id, Name, Available_Places__c, Capacity__c, Sex__c, Dormitory__r.Name 
                 FROM Room__c 
                 WHERE Parent_Room__c = NULL 
-                AND Id NOT IN :childRooms.keySet()
+                AND Id NOT IN :parentRoomsIds
                 AND (Sex__c = :studentGender OR Sex__c = NULL) 
                 AND Available_Places__c > 0
                 ORDER BY Available_Places__c ASC
