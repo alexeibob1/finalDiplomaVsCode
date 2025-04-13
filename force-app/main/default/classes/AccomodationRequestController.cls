@@ -78,6 +78,10 @@ public without sharing class AccomodationRequestController {
                 throw new AccomodationRequestException('Заявка уже отменена.');
             }
 
+            if (request.Status__c == 'Подана') {
+                throw new AccomodationRequestException('Заявка уже обрабатывается, для её отмены обратитесь в деканат.');
+            }
+
             request.Status__c = 'Отменена';
             update request;
         } catch (Exception e) {
