@@ -7,6 +7,7 @@ import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import { getPicklistValues } from 'lightning/uiObjectInfoApi';
 import MAINTENANCE_OBJECT from '@salesforce/schema/Maintenance_Request__c';
 import TYPE_FIELD from '@salesforce/schema/Maintenance_Request__c.Type__c';
+import Toast from 'lightning/toast';
 
 export default class MaintenanceRequestForm extends LightningElement {
     @track typeOptions = [];
@@ -23,6 +24,7 @@ export default class MaintenanceRequestForm extends LightningElement {
 
     showRoomSelection = false;
     isCommonArea = false;
+    isLoading = false;
 
     recordTypeId;
 
@@ -49,6 +51,7 @@ export default class MaintenanceRequestForm extends LightningElement {
     }
 
     async connectedCallback() {
+        this.isLoading = true;
         try {
             const context = await getStudentContext();
             this.roomId = context.roomId;
@@ -57,13 +60,15 @@ export default class MaintenanceRequestForm extends LightningElement {
             this.gender = context.gender;
             this.roomName = context.roomName;
 
-            const rooms = await getRoomsForDormitory({dormitoryId: this.dormitoryId});
+            const rooms = await getRoomsForDormitory({ dormitoryId: this.dormitoryId });
             this.roomOptions = rooms.map(room => ({
                 label: room.Name,
                 value: room.Id
             }));
         } catch (err) {
             console.error('Ошибка при инициализации:', err);
+        } finally {
+            this.isLoading = false;
         }
     }
 
@@ -76,28 +81,59 @@ export default class MaintenanceRequestForm extends LightningElement {
         this.showRoomSelection = !this.showRoomSelection;
     }
 
-    toggleCommonArea() {
-        this.isCommonArea = !this.isCommonArea;
+    toggleCommonArea(event) {
+        this.isCommonArea = event.target.checked;
     }
 
     async handleSubmit() {
         if (!this.type || !this.description || (this.isCommonArea && !this.commonArea) || (!this.isCommonArea && !this.roomId)) {
+            Toast.show({ 
+                label: 'Ошибка', 
+                message: 'Пожалуйста, заполните все обязательные поля.', 
+                variant: 'error', 
+                mode: 'dismissible' 
+            });
             return;
         }
 
+        this.isLoading = true;
+
         const payload = {
             studentId: this.studentId,
-            roomId: this.roomId,
+            roomId: this.isCommonArea ? null : this.roomId,
+            commonArea: this.isCommonArea ? this.commonArea : null,
             description: this.description,
             type: this.type,
-            dormitoryId: this.dormitoryId,
-            commonArea: this.isCommonArea ? this.commonArea : ''
+            dormitoryId: this.dormitoryId
         };
 
         try {
-            await createMaintenanceRequest( payload );
+            await createMaintenanceRequest({ payload });
+            Toast.show({ 
+                label: 'Успешно', 
+                message: 'Заявка отправлена', 
+                variant: 'success', 
+                mode: 'dismissible' 
+            });
+
+            // Optional reset form
+            this.type = '';
+            this.description = '';
+            this.commonArea = '';
+            this.roomId = '';
+            this.isCommonArea = false;
+            this.showRoomSelection = false;
+
         } catch (error) {
             console.error('Ошибка при создании заявки:', error);
+            Toast.show({ 
+                label: 'Ошибка', 
+                message: 'Не удалось отправить заявку', 
+                variant: 'error', 
+                mode: 'dismissible' 
+            });
+        } finally {
+            this.isLoading = false;
         }
     }
 }

@@ -1,6 +1,13 @@
 <template>
     <lightning-card title="Заявка на ремонт">
         <div class="slds-p-around_medium">
+
+            <template if:true={isLoading}>
+                <div class="slds-align_absolute-center">
+                    <lightning-spinner alternative-text="Загрузка..." size="large"></lightning-spinner>
+                </div>
+            </template>
+
             <lightning-combobox
                 name="type"
                 label="Тип неисправности"
@@ -20,33 +27,9 @@
 
             <lightning-input
                 type="checkbox"
-                label="Выбрать другую комнату"
-                onchange={toggleRoomEdit}>
-            </lightning-input>
-
-            <template if:true={showRoomSelection}>
-                <lightning-combobox
-                    name="roomId"
-                    label="Комната"
-                    value={roomId}
-                    options={roomOptions}
-                    onchange={handleChange}
-                    required>
-                </lightning-combobox>
-            </template>
-
-            <template if:false={showRoomSelection}>
-                <lightning-input
-                    label="Комната"
-                    value={roomName}
-                    disabled>
-                </lightning-input>
-            </template>
-
-            <lightning-input
-                type="checkbox"
                 label="Заявка на общую зону"
-                onchange={toggleCommonArea}>
+                onchange={toggleCommonArea}
+                checked={isCommonArea}>
             </lightning-input>
 
             <template if:true={isCommonArea}>
@@ -57,6 +40,33 @@
                     onchange={handleChange}
                     required>
                 </lightning-input>
+            </template>
+
+            <template if:false={isCommonArea}>
+                <lightning-input
+                    type="checkbox"
+                    label="Выбрать другую комнату"
+                    onchange={toggleRoomEdit}>
+                </lightning-input>
+
+                <template if:true={showRoomSelection}>
+                    <lightning-combobox
+                        name="roomId"
+                        label="Комната"
+                        value={roomId}
+                        options={roomOptions}
+                        onchange={handleChange}
+                        required>
+                    </lightning-combobox>
+                </template>
+
+                <template if:false={showRoomSelection}>
+                    <lightning-input
+                        label="Комната"
+                        value={roomName}
+                        disabled>
+                    </lightning-input>
+                </template>
             </template>
 
             <lightning-button
