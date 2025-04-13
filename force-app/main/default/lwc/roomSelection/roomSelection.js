@@ -15,7 +15,7 @@ const COLUMNS = [
 
     { label: 'Свободных мест', fieldName: 'Available_Places__c', type: 'number' },
     { label: 'Вместимость', fieldName: 'Capacity__c', type: 'number' },
-    { type: 'button', typeAttributes: { label: 'Выбрать', name: 'select', variant: 'brand' } }
+    { type: 'button', typeAttributes: { label: 'Заселить', name: 'select', variant: 'brand' } }
 ];
 
 export default class RoomSelection extends LightningElement {
@@ -45,7 +45,9 @@ export default class RoomSelection extends LightningElement {
     }
 
     async loadRooms() {
-        if (!this.studentRecord) return;
+        if (!this.studentRecord) {
+            return;
+        }
 
         this.isLoading = true;
         try {
