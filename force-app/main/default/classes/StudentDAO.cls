@@ -31,24 +31,24 @@ public without sharing class StudentDAO {
     }
 
     @AuraEnabled
-public static Account getCurrentUserAccount() {
-    try {
-        Id contactId = [SELECT ContactId FROM User WHERE Id = :UserInfo.getUserId()].ContactId;
+    public static Account getCurrentUserAccount() {
+        try {
+            Id contactId = [SELECT ContactId FROM User WHERE Id = :UserInfo.getUserId()].ContactId;
 
-        if (contactId == null) {
-            throw new AuraHandledException('Contact not found for the current user.');
+            if (contactId == null) {
+                throw new AuraHandledException('Contact not found for the current user.');
+            }
+
+            Account studentAccount = [
+                SELECT Id, PersonContact.Sex__c, PersonContact.Room__c, PersonContact.Room__r.Floor__c
+                FROM Account
+                WHERE PersonContactId = :contactId
+                LIMIT 1
+            ];
+
+            return studentAccount;
+        } catch (Exception e) {
+            throw new AuraHandledException('Failed to retrieve student account: ' + e.getMessage());
         }
-
-        Account studentAccount = [
-            SELECT Id, PersonContact.Sex__c, PersonContact.Room__c, PersonContact.Room__r.Floor__c
-            FROM Account
-            WHERE PersonContactId = :contactId
-            LIMIT 1
-        ];
-
-        return studentAccount;
-    } catch (Exception e) {
-        throw new AuraHandledException('Failed to retrieve student account: ' + e.getMessage());
     }
-}
 }

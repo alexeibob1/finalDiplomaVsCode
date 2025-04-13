@@ -6,12 +6,7 @@ public with sharing class AccomodationRequestController {
                 throw new AccomodationRequestException('You cannot submit request at the moment.');
             }
 
-            Id contactId = [SELECT ContactId FROM User WHERE Id = :UserInfo.getUserId()].ContactId;
-            if (contactId == null) {
-                throw new AccomodationRequestException('Contact not found for the logged-in user.');
-            }
-
-            Account studentAccount = [SELECT Id FROM Account WHERE PersonContactId = :contactId LIMIT 1];
+            Account studentAccount = StudentDAO.getCurrentUserAccount();
 
             if (studentAccount == null) {
                 throw new AccomodationRequestException('No associated Person Account found.');
@@ -35,7 +30,7 @@ public with sharing class AccomodationRequestController {
     @AuraEnabled
     public static List<Accomodation_Request__c> getStudentRequests() {
         try {
-            Account studentAccount = getStudentAccount();
+            Account studentAccount = StudentDAO.getCurrentUserAccount();
 
             return [
                 SELECT Id, Name, CreatedDate, toLabel(Status__c), Room__c
@@ -43,12 +38,6 @@ public with sharing class AccomodationRequestController {
                 WHERE Student__c = :studentAccount.Id
                 ORDER BY CreatedDate DESC
             ];
-
-            // return [
-            //     SELECT Id, Name, CreatedDate, toLabel(Status__c), Room__c
-            //     FROM Accomodation_Request__c
-            //     ORDER BY CreatedDate DESC
-            // ];
         } catch (Exception e) {
             LOGGER.error('Error fetching student requests: ' + e.getMessage());
             LOGGER.saveLog();
@@ -63,7 +52,7 @@ public with sharing class AccomodationRequestController {
 
     @AuraEnabled
     public static Boolean isRequestSubmissionAvailable() {
-        Account studentAccount = getStudentAccount();
+        Account studentAccount = StudentDAO.getCurrentUserAccount();
 
         List<Accomodation_Request__c> requests = [
             SELECT Id, Name, CreatedDate, Status__c, Room__c
@@ -76,20 +65,6 @@ public with sharing class AccomodationRequestController {
         }
 
         return true;
-    }
-
-    public static Account getStudentAccount() {
-        Id contactId = [SELECT ContactId FROM User WHERE Id = :UserInfo.getUserId()].ContactId;
-        if (contactId == null) {
-            throw new AccomodationRequestException('Contact not found for the logged-in user.');
-        }
-
-        Account studentAccount = [SELECT Id FROM Account WHERE PersonContactId = :contactId LIMIT 1];
-        if (studentAccount == null) {
-            throw new AccomodationRequestException('No associated Person Account found.');
-        }
-
-        return studentAccount;
     }
 
     @AuraEnabled
