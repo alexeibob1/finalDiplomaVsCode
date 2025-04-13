@@ -1,4 +1,4 @@
-public with sharing class AccomodationRequestController {
+public without sharing class AccomodationRequestController {
     @AuraEnabled
     public static Id createAccommodationRequest() {
         try {
@@ -88,17 +88,50 @@ public with sharing class AccomodationRequestController {
     @AuraEnabled
     public static void updateAccomodationRequestRoom(Id requestId, Id roomId) {
         try {
-            Accomodation_Request__c request = [
-                SELECT Id, Room__c 
-                FROM Accomodation_Request__c 
-                WHERE Id = :requestId 
+            Account studentAccount = StudentDAO.getAccountByAccomodationRequestId(requestId);
+            if (studentAccount == null) {
+                throw new AccomodationRequestException('Student not found for the request.');
+            }
+
+            Room__c selectedRoom = [
+                SELECT Id, Available_Places__c, Sex__c
+                FROM Room__c
+                WHERE Id = :roomId
                 LIMIT 1
             ];
-            
+
+            if (selectedRoom.Available_Places__c == null || selectedRoom.Available_Places__c <= 0) {
+                throw new AccomodationRequestException('В выбранной комнате нет свободных мест.');
+            }
+
+            if (selectedRoom.Sex__c != null && selectedRoom.Sex__c != studentAccount.PersonContact.Sex__c) {
+                throw new AccomodationRequestException('Выбранная комната не соответствует полу студента.');
+            }
+
+            Accomodation_Request__c request = [
+                SELECT Id, Status__c, Room__c
+                FROM Accomodation_Request__c
+                WHERE Id = :requestId
+                LIMIT 1
+            ];
+
             request.Room__c = roomId;
-            update request;
+            request.Status__c = 'Заселен';
+
+            Contact studentContact = [
+                SELECT Id, Room__c
+                FROM Contact
+                WHERE AccountId = :studentAccount.Id
+                LIMIT 1
+            ];
+            studentContact.Room__c = roomId;
+
+            selectedRoom.Available_Places__c -= 1;
+
+            update new List<SObject> { request, studentContact, selectedRoom };
+
         } catch (Exception e) {
-            throw new AccomodationRequestException('Error updating request room: ' + e.getMessage());
+            throw new AccomodationRequestException('Ошибка при заселении: ' + e.getMessage());
         }
     }
 
