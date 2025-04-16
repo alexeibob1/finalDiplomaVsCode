@@ -51,7 +51,7 @@ public without sharing class MaintenanceRequestController {
     public static List<Maintenance_Request__c> getStudentMaintenanceRequests() {
         Id studentId = StudentDAO.getCurrentUserAccount().Id;
         return [
-            SELECT Id, Name, CreatedDate, Location__c
+            SELECT Id, Name, CreatedDate, Location__c, Status__c
             FROM Maintenance_Request__c
             WHERE Student__c = :studentId
             ORDER BY CreatedDate DESC

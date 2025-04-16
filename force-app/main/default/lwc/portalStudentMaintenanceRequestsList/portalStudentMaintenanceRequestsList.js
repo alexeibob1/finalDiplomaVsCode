@@ -4,17 +4,17 @@ import Toast from 'lightning/toast';
 
 const COLUMNS = [
     {
+        label: 'Номер заявки',
+        fieldName: 'Name',
+    },
+    {
         label: 'Локация',
         fieldName: 'Location__c'
     },
     {
-        label: 'Номер заявки',
-        fieldName: 'recordLink',
-        type: 'url',
-        typeAttributes: {
-            label: { fieldName: 'Name' },
-            target: '_blank'
-        }
+        label: 'Статус',
+        fieldName: 'Status__c',
+        sortable: false
     },
     {
         label: 'Дата создания',
@@ -45,11 +45,7 @@ export default class PortalStudentMaintenanceRequestsList extends LightningEleme
 
         try {
             const result = await getStudentMaintenanceRequests();
-            // Build URL links
-            this.requests = result.map(req => ({
-                ...req,
-                recordLink: `/s/detail/${req.Id}` // Adjust `/s/` if your Experience URL structure differs
-            }));
+            this.requests = result;
             this.error = null;
         } catch (err) {
             this.requests = [];
