@@ -1,0 +1,22 @@
+<template>
+    <template if:true={isLoading}>
+        <div class="slds-align_absolute-center">
+            <lightning-spinner alternative-text="Загрузка..." size="large"></lightning-spinner>
+        </div>
+    </template>
+
+    <lightning-layout multiple-rows class="slds-m-around_medium">
+        <lightning-layout-item size="12" class="slds-m-bottom_medium">
+            <c-maintenance-request-form
+                onloading={handleLoading}
+                onrequestcreated={handleRequestCreated}>
+            </c-maintenance-request-form>
+        </lightning-layout-item>
+
+        <lightning-layout-item size="12">
+            <c-portal-student-maintenance-requests-list
+                onloading={handleLoading}>
+            </c-portal-student-maintenance-requests-list>
+        </lightning-layout-item>
+    </lightning-layout>
+</template>

@@ -10,12 +10,7 @@ public without sharing class MaintenanceRequestController {
 
     @AuraEnabled
     public static Map<String, Object> getStudentContext() {
-        User currentUser = [SELECT Id, AccountId FROM User WHERE Id = :UserInfo.getUserId()];
-        Account student = [
-            SELECT Id, PersonContact.Room__c, PersonContact.Room__r.Dormitory__c, PersonContact.Room__r.Name
-            FROM Account WHERE Id = :currentUser.AccountId
-        ];
-
+        Account student = StudentDAO.getCurrentUserAccount();
         return new Map<String, Object>{
             'studentId' => student.Id,
             'roomId' => student.PersonContact.Room__c,
@@ -50,5 +45,16 @@ public without sharing class MaintenanceRequestController {
         }
 
         insert request;
+    }
+
+    @AuraEnabled
+    public static List<Maintenance_Request__c> getStudentMaintenanceRequests() {
+        Id studentId = StudentDAO.getCurrentUserAccount().Id;
+        return [
+            SELECT Id, Name, CreatedDate, Location__c
+            FROM Maintenance_Request__c
+            WHERE Student__c = :studentId
+            ORDER BY CreatedDate DESC
+        ];
     }
 }

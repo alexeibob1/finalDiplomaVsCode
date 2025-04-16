@@ -1,0 +1,22 @@
+<template>
+    <template if:true={error}>
+        <div class="slds-text-color_error slds-m-around_medium">
+            ⚠ {error}
+        </div>
+    </template>
+
+    <template if:true={requests.length}>
+        <lightning-datatable
+            key-field="Id"
+            data={requests}
+            columns={columns}
+            hide-checkbox-column
+            class="custom-datatable"
+            resize-column-disabled>
+        </lightning-datatable>
+    </template>
+
+    <template if:false={requests.length}>
+        <p class="slds-text-align_center slds-m-top_medium">Заявок на ремонт пока нет.</p>
+    </template>
+</template>

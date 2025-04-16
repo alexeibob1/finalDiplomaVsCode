@@ -124,6 +124,8 @@ export default class MaintenanceRequestForm extends LightningElement {
             this.isCommonArea = false;
             this.showRoomSelection = false;
 
+            this.dispatchEvent(new CustomEvent('requestcreated'));
+
         } catch (error) {
             console.error('Ошибка при создании заявки:', error);
             Toast.show({ 

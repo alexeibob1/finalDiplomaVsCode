@@ -40,7 +40,9 @@ public without sharing class StudentDAO {
             }
 
             Account studentAccount = [
-                SELECT Id, PersonContact.Sex__c, PersonContact.Room__c, PersonContact.Room__r.Floor__c
+                SELECT Id, 
+                    PersonContact.Sex__c, PersonContact.Room__c, PersonContact.Room__r.Floor__c,
+                    PersonContact.Room__r.Name, PersonContact.Room__r.Dormitory__c
                 FROM Account
                 WHERE PersonContactId = :contactId
                 LIMIT 1
