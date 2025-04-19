@@ -1,7 +1,7 @@
 import { LightningElement, api, track } from 'lwc';
 import getAvailableRooms from '@salesforce/apex/RoomSelectionController.getAvailableRooms';
 import getTotalRoomsCount from '@salesforce/apex/RoomSelectionController.getTotalRoomsCount';
-import getStudent from '@salesforce/apex/StudentDAO.getAccountByAccomodationRequestId';
+import getStudent from '@salesforce/apex/StudentDAO.getContactByAccomodationRequestId';
 import updateAccomodationRequestRoom from '@salesforce/apex/AccomodationRequestController.updateAccomodationRequestRoom';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
@@ -51,7 +51,7 @@ export default class RoomSelection extends LightningElement {
 
         this.isLoading = true;
         try {
-            const studentGender = this.studentRecord.PersonContact.Sex__c;
+            const studentGender = this.studentRecord.Sex__c;
             this.totalRooms = await getTotalRoomsCount({ studentGender });
             this.rooms = (await getAvailableRooms({ studentGender, pageNumber: this.pageNumber, pageSize: this.pageSize }))
                 .map(room => ({
