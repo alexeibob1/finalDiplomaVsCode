@@ -20,33 +20,32 @@ public class UpdateSocialUsefulHoursBatchable implements Database.Batchable<sObj
     public Database.QueryLocator start(Database.BatchableContext bc) {
         return Database.getQueryLocator([
             SELECT Id
-            FROM Account
-            WHERE IsPersonAccount = true
-              AND PersonContact.Room__c != NULL
+            FROM Contact
+            WHERE Room__c != NULL
         ]);
     }
 
-    public void execute(Database.BatchableContext bc, List<Account> scope) {
-        Set<Id> personAccountIds = new Set<Id>();
-        for (Account acc : scope) {
-            personAccountIds.add(acc.Id);
+    public void execute(Database.BatchableContext bc, List<Contact> scope) {
+        Set<Id> contactIds = new Set<Id>();
+        for (Contact contactObj : scope) {
+            contactIds.add(contactObj.Id);
         }
 
         Map<Id, Decimal> hoursPerStudent = new Map<Id, Decimal>();
 
         for (AggregateResult ar : [
-            SELECT Student__c Id, SUM(Hours__c) total
+            SELECT Student_Contact__c Id, SUM(Hours__c) total
             FROM Social_Useful_Work__c
             WHERE Work_Date__c >= :startDate
               AND Work_Date__c <= :endDate
-              AND Student__c IN :personAccountIds
-            GROUP BY Student__c
+              AND Student_Contact__c IN :contactIds
+            GROUP BY Student_Contact__c
         ]) {
             hoursPerStudent.put((Id) ar.get('Id'), (Decimal) ar.get('total'));
         }
 
-        for (Account acc : scope) {
-            acc.PersonContact.Current_Study_Year_Hours__c = hoursPerStudent.get(acc.Id) != null ? hoursPerStudent.get(acc.Id) : 0;
+        for (Contact contactObj : scope) {
+            contactObj.Current_Study_Year_Hours__c = hoursPerStudent.get(contactObj.Id) != null ? hoursPerStudent.get(contactObj.Id) : 0;
         }
 
         update scope;
