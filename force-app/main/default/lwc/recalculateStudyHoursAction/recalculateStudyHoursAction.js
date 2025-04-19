@@ -1,6 +1,7 @@
 import { LightningElement, api } from 'lwc';
 import recalculateSingleStudent from '@salesforce/apex/RecalculateStudyHoursActionController.recalculateSingleStudent';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
 
 export default class RecalculateStudyHoursAction extends LightningElement {
     @api recordId;
@@ -20,6 +21,8 @@ export default class RecalculateStudyHoursAction extends LightningElement {
                     variant: 'success'
                 })
             );
+
+            notifyRecordUpdateAvailable([{'recordId': this.recordId}]);
         } catch (error) {
             this.dispatchEvent(
                 new ShowToastEvent({
