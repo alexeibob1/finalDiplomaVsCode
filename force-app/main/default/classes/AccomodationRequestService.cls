@@ -3,8 +3,8 @@ public without sharing class AccomodationRequestService {
         List<Messaging.SingleEmailMessage> emails = new List<Messaging.SingleEmailMessage>();
 
         for (Accomodation_Request__c request : requests) {
-            System.debug('in call ' + request.Student__r);
-            if (String.isEmpty(request.Student__r.PersonEmail)) {
+            System.debug('in call ' + request.Student_Contact__r);
+            if (String.isEmpty(request.Student_Contact__r.Email)) {
                 System.debug('no email');
                 continue;
             }
@@ -15,7 +15,7 @@ public without sharing class AccomodationRequestService {
                           ' на проживание в общежитии была переведена в статус "' + request.Status__c + '".';
 
             Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
-            email.setToAddresses(new List<String>{ request.Student__r.PersonEmail });
+            email.setToAddresses(new List<String>{ request.Student_Contact__r.Email });
             email.setSubject(subject);
             email.setPlainTextBody(body);
             email.setSaveAsActivity(false);
@@ -35,7 +35,7 @@ public without sharing class AccomodationRequestService {
     public static void sendStatusUpdateEmailsAsync(List<Id> requestIds) {
         List<Accomodation_Request__c> requestsToSendEmail = [
             SELECT Id, Name, toLabel(Status__c), FX_Student_Name__c, 
-                Student__r.PersonEmail  
+                Student_Contact__r.Email  
             FROM Accomodation_Request__c
             WHERE Id IN :requestIds
         ];

@@ -1,37 +1,37 @@
 public without sharing class StudentDAO {
-    public static Account getAccountById(Id accountId) {
-        List<Account> accounts = [
-            SELECT Id, PersonContact.Sex__c
-            FROM Account
-            WHERE Id = :accountId
+    public static Contact getContactById(Id contactId) {
+        List<Contact> contacts = [
+            SELECT Id, Sex__c
+            FROM Contact
+            WHERE Id = :contactId
             LIMIT 1
         ];
 
-        if (!accounts.isEmpty()) {
-            return accounts[0];
+        if (!contacts.isEmpty()) {
+            return contacts[0];
         }
 
         return null;
     }
 
     @AuraEnabled
-    public static Account getAccountByAccomodationRequestId(Id requestId) {
-        List<Account> accounts = [
-            SELECT Id, PersonContact.Sex__c
-            FROM Account
-            WHERE Id IN (SELECT Student__c FROM Accomodation_Request__c WHERE Id = :requestId)
+    public static Contact getContactByAccomodationRequestId(Id requestId) {
+        List<Contact> contacts = [
+            SELECT Id, Sex__c
+            FROM Contact
+            WHERE Id IN (SELECT Student_Contact__c FROM Accomodation_Request__c WHERE Id = :requestId)
             LIMIT 1
         ];
 
-        if (!accounts.isEmpty()) {
-            return accounts[0];
+        if (!contacts.isEmpty()) {
+            return contacts[0];
         }
 
         return null;
     }
 
     @AuraEnabled
-    public static Account getCurrentUserAccount() {
+    public static Contact getCurrentUserContact() {
         try {
             Id contactId = [SELECT ContactId FROM User WHERE Id = :UserInfo.getUserId()].ContactId;
 
@@ -39,18 +39,18 @@ public without sharing class StudentDAO {
                 throw new AuraHandledException('Contact not found for the current user.');
             }
 
-            Account studentAccount = [
-                SELECT Id, 
-                    PersonContact.Sex__c, PersonContact.Room__c, PersonContact.Room__r.Floor__c,
-                    PersonContact.Room__r.Name, PersonContact.Room__r.Dormitory__c
-                FROM Account
-                WHERE PersonContactId = :contactId
+            Contact studentContact = [
+                SELECT Id,
+                    Sex__c, Room__c, Room__r.Floor__c,
+                    Room__r.Name, Room__r.Dormitory__c
+                FROM Contact
+                WHERE Id = :contactId
                 LIMIT 1
             ];
 
-            return studentAccount;
+            return studentContact;
         } catch (Exception e) {
-            throw new AuraHandledException('Failed to retrieve student account: ' + e.getMessage());
+            throw new AuraHandledException('Failed to retrieve student contact: ' + e.getMessage());
         }
     }
 }

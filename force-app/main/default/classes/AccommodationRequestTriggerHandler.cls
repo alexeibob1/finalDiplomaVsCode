@@ -22,18 +22,18 @@ public without sharing class AccommodationRequestTriggerHandler extends TriggerH
         Set<Id> studentIds = new Set<Id>();
         for (Accomodation_Request__c req : newlySettled) {
             roomIds.add(req.Room__c);
-            studentIds.add(req.Student__c);
+            studentIds.add(req.Student_Contact__c);
         }
 
         Map<Id, Room__c> rooms = getRoomsWithParent(roomIds);
-        Map<Id, Account> students = getStudentsWithSex(studentIds);
+        Map<Id, Contact> students = getStudentsWithSex(studentIds);
 
         List<Room__c> roomsToUpdate = new List<Room__c>();
 
         for (Accomodation_Request__c req : newlySettled) {
             Room__c room = rooms.get(req.Room__c);
-            Account student = students.get(req.Student__c);
-            String studentSex = student.PersonContact.Sex__c;
+            Contact student = students.get(req.Student_Contact__c);
+            String studentSex = student.Sex__c;
 
             if (room.Sex__c == null) {
                 Integer currentOccupants = [
@@ -74,36 +74,34 @@ public without sharing class AccommodationRequestTriggerHandler extends TriggerH
         if (evictedRequests.isEmpty()) {
             return;
         }
-    
+
         Set<Id> roomIds = new Set<Id>();
         Set<Id> studentIds = new Set<Id>();
-    
+
         for (Accomodation_Request__c req : evictedRequests) {
             if (req.Room__c != null) {
                 roomIds.add(req.Room__c);
             }
-            if (req.Student__c != null) {
-                studentIds.add(req.Student__c);
+            if (req.Student_Contact__c != null) {
+                studentIds.add(req.Student_Contact__c);
             }
         }
-    
+
         Map<Id, Room__c> rooms = getRoomsWithParent(roomIds);
-        Map<Id, Account> students = getStudentsWithContact(studentIds);
-    
+        Map<Id, Contact> students = getStudentsById(studentIds);
+
         // Step 1: Clear Contact.Room__c
         List<Contact> contactsToUpdate = new List<Contact>();
-        for (Account acc : students.values()) {
-            if (acc.PersonContactId != null) {
-                contactsToUpdate.add(new Contact(
-                    Id = acc.PersonContactId,
-                    Room__c = null
-                ));
-            }
+        for (Contact contact : students.values()) {
+            contactsToUpdate.add(new Contact(
+                Id = contact.Id,
+                Room__c = null
+            ));
         }
         if (!contactsToUpdate.isEmpty()) {
             update contactsToUpdate;
         }
-    
+
         // Step 2: Increment Available_Places__c
         for (Accomodation_Request__c req : evictedRequests) {
             if (req.Room__c != null && rooms.containsKey(req.Room__c)) {
@@ -115,28 +113,28 @@ public without sharing class AccommodationRequestTriggerHandler extends TriggerH
                 }
             }
         }
-    
+
         // Step 3: Clear Sex__c only for truly empty rooms
         Set<Id> parentRoomIdsToClear = new Set<Id>();
         Map<Id, Room__c> allRoomsToClearSexMap = new Map<Id, Room__c>();
-    
+
         for (Room__c room : rooms.values()) {
             Integer stillOccupied = [
                 SELECT COUNT()
                 FROM Accomodation_Request__c
                 WHERE Room__c = :room.Id AND Status__c = 'Заселен'
             ];
-    
+
             if (stillOccupied == 0) {
                 room.Sex__c = null;
                 allRoomsToClearSexMap.put(room.Id, room);
-    
+
                 if (room.Parent_Room__c != null) {
                     parentRoomIdsToClear.add(room.Parent_Room__c);
                 }
             }
         }
-    
+
         if (!parentRoomIdsToClear.isEmpty()) {
             List<Room__c> related = [
                 SELECT Id, Sex__c
@@ -148,16 +146,15 @@ public without sharing class AccommodationRequestTriggerHandler extends TriggerH
                 allRoomsToClearSexMap.put(r.Id, r);
             }
         }
-    
+
         if (!rooms.isEmpty()) {
             update rooms.values();
         }
-    
+
         if (!allRoomsToClearSexMap.isEmpty()) {
             update allRoomsToClearSexMap.values(); // ✅ No duplicate Ids!
         }
     }
-    
 
     // ---------------------- Helper Methods ----------------------
 
@@ -168,7 +165,7 @@ public without sharing class AccommodationRequestTriggerHandler extends TriggerH
             if (req.Status__c == 'Заселен' &&
                 oldReq.Status__c != 'Заселен' &&
                 req.Room__c != null &&
-                req.Student__c != null) {
+                req.Student_Contact__c != null) {
                 result.add(req);
             }
         }
@@ -218,18 +215,18 @@ public without sharing class AccommodationRequestTriggerHandler extends TriggerH
         return rooms;
     }
 
-    private Map<Id, Account> getStudentsWithSex(Set<Id> studentIds) {
-        return new Map<Id, Account>([
-            SELECT Id, PersonContact.Sex__c
-            FROM Account
+    private Map<Id, Contact> getStudentsWithSex(Set<Id> studentIds) {
+        return new Map<Id, Contact>([
+            SELECT Id, Sex__c
+            FROM Contact
             WHERE Id IN :studentIds
         ]);
     }
 
-    private Map<Id, Account> getStudentsWithContact(Set<Id> studentIds) {
-        return new Map<Id, Account>([
-            SELECT Id, PersonContactId
-            FROM Account
+    private Map<Id, Contact> getStudentsById(Set<Id> studentIds) {
+        return new Map<Id, Contact>([
+            SELECT Id
+            FROM Contact
             WHERE Id IN :studentIds
         ]);
     }

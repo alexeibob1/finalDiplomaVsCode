@@ -6,14 +6,14 @@ public without sharing class AccomodationRequestController {
                 throw new AccomodationRequestException('You cannot submit request at the moment.');
             }
 
-            Account studentAccount = StudentDAO.getCurrentUserAccount();
+            Contact studentContact = StudentDAO.getCurrentUserContact();
 
-            if (studentAccount == null) {
-                throw new AccomodationRequestException('No associated Person Account found.');
+            if (studentContact == null) {
+                throw new AccomodationRequestException('No associated Contact found.');
             }
 
             Accomodation_Request__c newRequest = new Accomodation_Request__c(
-                Student__c = studentAccount.Id,
+                Student_Contact__c = studentContact.Id,
                 Status__c = 'Подана'
             );
 
@@ -30,12 +30,12 @@ public without sharing class AccomodationRequestController {
     @AuraEnabled
     public static List<Accomodation_Request__c> getStudentRequests() {
         try {
-            Account studentAccount = StudentDAO.getCurrentUserAccount();
+            Contact studentContact = StudentDAO.getCurrentUserContact();
 
             return [
                 SELECT Id, Name, CreatedDate, toLabel(Status__c), Room__c
                 FROM Accomodation_Request__c
-                WHERE Student__c = :studentAccount.Id
+                WHERE Student_Contact__c = :studentContact.Id
                 ORDER BY CreatedDate DESC
             ];
         } catch (Exception e) {
@@ -52,12 +52,12 @@ public without sharing class AccomodationRequestController {
 
     @AuraEnabled
     public static Boolean isRequestSubmissionAvailable() {
-        Account studentAccount = StudentDAO.getCurrentUserAccount();
+        Contact studentContact = StudentDAO.getCurrentUserContact();
 
         List<Accomodation_Request__c> requests = [
             SELECT Id, Name, CreatedDate, Status__c, Room__c
             FROM Accomodation_Request__c
-            WHERE Student__c = :studentAccount.Id AND Status__c IN ('Одобрена', 'Документы приняты', 'Подана')
+            WHERE Student_Contact__c = :studentContact.Id AND Status__c IN ('Одобрена', 'Документы приняты', 'Подана')
         ];
 
         if (!requests.isEmpty()) {
@@ -92,8 +92,8 @@ public without sharing class AccomodationRequestController {
     @AuraEnabled
     public static void updateAccomodationRequestRoom(Id requestId, Id roomId) {
         try {
-            Account studentAccount = StudentDAO.getAccountByAccomodationRequestId(requestId);
-            if (studentAccount == null) {
+            Contact studentContact = StudentDAO.getContactByAccomodationRequestId(requestId);
+            if (studentContact == null) {
                 throw new AccomodationRequestException('Student not found for the request.');
             }
 
@@ -108,7 +108,7 @@ public without sharing class AccomodationRequestController {
                 throw new AccomodationRequestException('В выбранной комнате нет свободных мест.');
             }
 
-            if (selectedRoom.Sex__c != null && selectedRoom.Sex__c != studentAccount.PersonContact.Sex__c) {
+            if (selectedRoom.Sex__c != null && selectedRoom.Sex__c != studentContact.Sex__c) {
                 throw new AccomodationRequestException('Выбранная комната не соответствует полу студента.');
             }
 
@@ -122,12 +122,6 @@ public without sharing class AccomodationRequestController {
             request.Room__c = roomId;
             request.Status__c = 'Заселен';
 
-            Contact studentContact = [
-                SELECT Id, Room__c
-                FROM Contact
-                WHERE AccountId = :studentAccount.Id
-                LIMIT 1
-            ];
             studentContact.Room__c = roomId;
 
             selectedRoom.Available_Places__c -= 1;
