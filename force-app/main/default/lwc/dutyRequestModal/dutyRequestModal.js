@@ -35,7 +35,7 @@ export default class DutyRequestModal extends LightningElement {
                 getMonthDutyById({ monthDutyId: this.monthDutyId }),
                 getShiftsForMonthDuty({ monthDutyId: this.monthDutyId }),
                 getRequestsForStudentAndMonth({ studentId: this.studentId, monthDutyId: this.monthDutyId }),
-                getCurrentRequestCountForMonthDuty({ studentAccountId: this.studentId, monthDutyId: this.monthDutyId })
+                getCurrentRequestCountForMonthDuty({ studentId: this.studentId, monthDutyId: this.monthDutyId })
             ]);
 
             this.shifts = shifts;
@@ -48,7 +48,7 @@ export default class DutyRequestModal extends LightningElement {
 
             // Store existing requests to disable those cells
             existing.forEach(req => {
-                const key = `${req.Duty_Date__c}-${req.Duty_Shift__c}`;
+                const key = `${req.Duty_Date__c}-${req.Month_Duty_Shift__c}`;
                 this.existingRequests.add(key);
             });
 
@@ -70,6 +70,9 @@ export default class DutyRequestModal extends LightningElement {
     generateCalendarData(year, month) {
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const rows = [];
+
+        console.log('shifts', JSON.stringify(this.shifts));
+        console.log('existing', JSON.stringify(this.existingRequests));
     
         for (let day = 1; day <= daysInMonth; day++) {
             const dateObj = new Date(year, month, day);
@@ -81,12 +84,16 @@ export default class DutyRequestModal extends LightningElement {
                     const key = `${dateISO}-${shift.Id}`;
                     return {
                         key,
-                        shiftId: shift.Id
+                        shiftId: shift.Id,
+                        disabled: this.existingRequests.has(key),
+                        checked: false
                     };
                 })
             };
             rows.push(row);
         }
+
+        console.log('rows', JSON.stringify(rows));
     
         this.calendarData = rows;
     }
@@ -128,6 +135,7 @@ export default class DutyRequestModal extends LightningElement {
             this.showSuccess('Заявка успешно отправлена');
             this.dispatchEvent(new CustomEvent('close'));
         } catch (err) {
+            console.error(err);
             this.showError(err.body?.message || err.message);
         } finally {
             this.isLoading = false;

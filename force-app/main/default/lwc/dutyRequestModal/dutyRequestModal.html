@@ -34,15 +34,14 @@
                                     <td>{row.date}</td>
                                     <template for:each={row.cells} for:item="cell">
                                         <td key={cell.key}>
-                                            <lightning-input
+                                            <input 
                                                 type="radio"
-                                                name="dutySelection"
+                                                name={row.date}
                                                 data-date={row.date}
                                                 data-shift-id={cell.shiftId}
                                                 checked={cell.checked}
-                                                onchange={handleRadioChange}
-                                                disabled={cell.disabled}>
-                                            </lightning-input>
+                                                disabled={cell.disabled}
+                                                onchange={handleRadioChange} />
                                         </td>
                                     </template>
                                 </tr>
