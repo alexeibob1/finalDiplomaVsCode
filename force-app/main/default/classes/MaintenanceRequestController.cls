@@ -10,12 +10,12 @@ public without sharing class MaintenanceRequestController {
 
     @AuraEnabled
     public static Map<String, Object> getStudentContext() {
-        Account student = StudentDAO.getCurrentUserAccount();
+        Contact student = StudentDAO.getCurrentUserContact();
         return new Map<String, Object>{
             'studentId' => student.Id,
-            'roomId' => student.PersonContact.Room__c,
-            'roomName' => student.PersonContact.Room__r.Name,
-            'dormitoryId' => student.PersonContact.Room__r.Dormitory__c
+            'roomId' => student.Room__c,
+            'roomName' => student.Room__r.Name,
+            'dormitoryId' => student.Room__r.Dormitory__c
         };
     }
 
@@ -32,7 +32,7 @@ public without sharing class MaintenanceRequestController {
     @AuraEnabled
     public static void createMaintenanceRequest(MaintenancePayload payload) {
         Maintenance_Request__c request = new Maintenance_Request__c();
-        request.Student__c = payload.studentId;
+        request.Student_Contact__c = payload.studentId;
         request.Type__c = payload.type;
         request.Description__c = payload.description;
         request.Dormitory__c = payload.dormitoryId;
@@ -49,11 +49,11 @@ public without sharing class MaintenanceRequestController {
 
     @AuraEnabled
     public static List<Maintenance_Request__c> getStudentMaintenanceRequests() {
-        Id studentId = StudentDAO.getCurrentUserAccount().Id;
+        Id studentId = StudentDAO.getCurrentUserContact().Id;
         return [
             SELECT Id, Name, CreatedDate, Location__c, Status__c
             FROM Maintenance_Request__c
-            WHERE Student__c = :studentId
+            WHERE Student_Contact__c = :studentId
             ORDER BY CreatedDate DESC
         ];
     }
