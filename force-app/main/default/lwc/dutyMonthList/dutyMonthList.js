@@ -2,6 +2,7 @@ import { LightningElement, track } from 'lwc';
 import getCurrentUserContact from '@salesforce/apex/StudentDAO.getCurrentUserContact';
 import getAvailableMonthDuties from '@salesforce/apex/DutyController.getAvailableMonthDuties';
 import getAvailableMonthDutiesCount from '@salesforce/apex/DutyController.getAvailableMonthDutiesCount';
+import DutyModal from 'c/dutyRequestModal';
 
 const actions = [
     { label: 'Записаться', name: 'apply' }
@@ -94,13 +95,20 @@ export default class DutyMonthList extends LightningElement {
         }
     }
 
-    handleRowAction(event) {
+    async handleRowAction(event) {
         const actionName = event.detail.action.name;
         const row = event.detail.row;
 
         if (actionName === 'apply') {
             this.selectedMonthDutyId = row.Id;
-            this.showModal = true;
+
+            const result = await DutyModal.open({
+                size: 'large', 
+                studentId: this.studentId,
+                monthDutyId: this.selectedMonthDutyId
+            });
+
+            // this.showModal = true;
         }
     }
 

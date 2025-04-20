@@ -151,6 +151,17 @@ public without sharing class DutyController {
         return requests.size();
     }
 
+    @AuraEnabled
+    public static Boolean hasExistingRequestsForShift(Date dutyDate, Id monthDutyShiftId) {
+        return [
+            SELECT COUNT()
+            FROM Duty_Request__c
+            WHERE Duty_Date__c = :dutyDate
+            AND Month_Duty_Shift__c = :monthDutyShiftId
+        ] > 0;
+    }
+
+
     public class DutyRequestWrapper {
         @AuraEnabled public Date dutyDate { get; set; }
         @AuraEnabled public Id monthDutyShiftId { get; set; }

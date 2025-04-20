@@ -4,11 +4,15 @@ import getRequestsForStudentAndMonth from '@salesforce/apex/DutyController.getRe
 import getCurrentRequestCountForMonthDuty from '@salesforce/apex/DutyController.getCurrentRequestCountForMonthDuty';
 import submitDutyRequests from '@salesforce/apex/DutyController.submitDutyRequests';
 import getMonthDutyById from '@salesforce/apex/DutyController.getMonthDutyById';
+import hasExistingRequestsForShift from '@salesforce/apex/DutyController.hasExistingRequestsForShift';
 import Toast from 'lightning/toast';
+import LightningModal from 'lightning/modal';
 
-export default class DutyRequestModal extends LightningElement {
+export default class DutyRequestModal extends LightningModal {
     @api monthDutyId;
     @api studentId;
+
+    @track showConflictModal = false;
 
     @track shifts = [];
     @track calendarData = [];
@@ -126,14 +130,17 @@ export default class DutyRequestModal extends LightningElement {
 
         try {
             this.isLoading = true;
-            await submitDutyRequests({
-                studentId: this.studentId,
-                monthDutyId: this.monthDutyId,
-                requests: [{ dutyDate, monthDutyShiftId: dutyShiftId }]
+            const hasConflict = await hasExistingRequestsForShift({
+                dutyDate: dutyDate,
+                monthDutyShiftId: dutyShiftId
             });
+            console.log('has conflist', hasConflict);
+            if (hasConflict) {
+                this.showConflictModal = true;
+            } else {
+                await this.submitRequest(dutyDate, dutyShiftId);
+            }
 
-            this.showSuccess('Заявка успешно отправлена');
-            this.dispatchEvent(new CustomEvent('close'));
         } catch (err) {
             console.error(err);
             this.showError(err.body?.message || err.message);
@@ -142,10 +149,38 @@ export default class DutyRequestModal extends LightningElement {
         }
     }
 
+    async submitRequest(dutyDate, dutyShiftId) {
+        try {
+            this.isLoading = true;
+            await submitDutyRequests({
+                studentId: this.studentId,
+                monthDutyId: this.monthDutyId,
+                requests: [{ dutyDate, monthDutyShiftId: dutyShiftId }]
+            });
     
+            this.showSuccess('Заявка успешно отправлена');
+            this.dispatchEvent(new CustomEvent('close'));
+        } catch (err) {
+            this.showError(err.body?.message || err.message);
+        } finally {
+            this.isLoading = false;
+            this.close('close');
+        }
+    }
+
+    handleConflictCancel() {
+        this.showConflictModal = false;
+    }
+    
+    async handleConflictConfirm() {
+        this.showConflictModal = false;
+    
+        const { dutyDate, dutyShiftId } = this.selectedRequest;
+        await this.submitRequest(dutyDate, dutyShiftId);
+    }    
 
     handleCancel() {
-        this.dispatchEvent(new CustomEvent('close'));
+        this.close('close');
     }
 
     showSuccess(message) {
