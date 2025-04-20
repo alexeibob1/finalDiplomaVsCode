@@ -1,5 +1,5 @@
 import { LightningElement, track } from 'lwc';
-import getCurrentUserAccount from '@salesforce/apex/StudentDAO.getCurrentUserAccount';
+import getCurrentUserContact from '@salesforce/apex/StudentDAO.getCurrentUserContact';
 import getAvailableMonthDuties from '@salesforce/apex/DutyController.getAvailableMonthDuties';
 import getAvailableMonthDutiesCount from '@salesforce/apex/DutyController.getAvailableMonthDutiesCount';
 
@@ -22,7 +22,7 @@ export default class DutyMonthList extends LightningElement {
     @track duties = [];
     @track columns = COLUMNS;
 
-    accountId;
+    studentId;
     pageSize = 10;
     pageNumber = 1;
     totalDuties = 0;
@@ -38,14 +38,14 @@ export default class DutyMonthList extends LightningElement {
     async init() {
         this.isLoading = true;
         try {
-            const account = await getCurrentUserAccount();
-            this.accountId = account?.Id;
+            const contact = await getCurrentUserContact();
+            this.studentId = contact?.Id;
 
-            if (this.accountId) {
+            if (this.studentId) {
                 await this.loadData();
             }
         } catch (error) {
-            console.error('Error retrieving current user account:', error);
+            console.error('Error retrieving current student:', error);
         } finally {
             this.isLoading = false;
         }
@@ -55,9 +55,9 @@ export default class DutyMonthList extends LightningElement {
         this.isLoading = true;
         try {
             const [count, duties] = await Promise.all([
-                getAvailableMonthDutiesCount({ studentAccountId: this.accountId }),
+                getAvailableMonthDutiesCount({ studentId: this.studentId }),
                 getAvailableMonthDuties({
-                    studentAccountId: this.accountId,
+                    studentId: this.studentId,
                     pageNumber: this.pageNumber,
                     pageSize: this.pageSize
                 })

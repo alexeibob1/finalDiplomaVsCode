@@ -304,7 +304,7 @@
                             <value>NAME</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>Account.NAME</value>
+                            <value>Student_Contact__c</value>
                         </valueListItems>
                         <valueListItems>
                             <value>Duty_Date__c</value>
@@ -338,6 +338,10 @@
         <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
+                    <name>active</name>
+                    <value>true</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
                     <name>body</name>
                     <value>Facet-20ed8682-2f70-4ba8-b481-6111f8a02282</value>
                 </componentInstanceProperties>
@@ -353,7 +357,7 @@
             <componentInstance>
                 <componentInstanceProperties>
                     <name>active</name>
-                    <value>true</value>
+                    <value>false</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>body</name>
