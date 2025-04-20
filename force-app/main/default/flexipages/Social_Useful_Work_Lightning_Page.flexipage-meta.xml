@@ -64,8 +64,18 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.Student__c</fieldItem>
-                <identifier>RecordStudent_cField</identifier>
+                <fieldItem>Record.Student_Contact__c</fieldItem>
+                <identifier>RecordStudent_Contact_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.Dormitory__c</fieldItem>
+                <identifier>RecordDormitory_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-2286448d-84a7-45d5-830c-73831dd58ad1</name>
@@ -138,16 +148,6 @@
                 </fieldInstanceProperties>
                 <fieldItem>Record.CreatedById</fieldItem>
                 <identifier>RecordCreatedByIdField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.OwnerId</fieldItem>
-                <identifier>RecordOwnerIdField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-b84e55fd-f40a-4658-a035-71f1f8f5611a</name>
