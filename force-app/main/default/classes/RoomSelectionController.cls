@@ -28,7 +28,7 @@ public with sharing class RoomSelectionController {
                 AND Id NOT IN :parentRoomsIds
                 AND (Sex__c = :studentGender OR Sex__c = NULL) 
                 AND Available_Places__c > 0
-                ORDER BY Available_Places__c ASC
+                ORDER BY Name, Available_Places__c
                 LIMIT :remaining OFFSET :offset
             ];
         }

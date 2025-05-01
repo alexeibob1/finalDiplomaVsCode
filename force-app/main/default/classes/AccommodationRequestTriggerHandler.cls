@@ -109,6 +109,10 @@ public without sharing class AccommodationRequestTriggerHandler extends TriggerH
                 } else {
                     r.Available_Places__c += 1;
                 }
+
+                if (r.Room_Leader__c != null && studentIds.contains(r.Room_Leader__c)) {
+                    r.Room_Leader__c = null;
+                }
             }
         }
 
@@ -185,7 +189,7 @@ public without sharing class AccommodationRequestTriggerHandler extends TriggerH
         Map<Id, Room__c> rooms = new Map<Id, Room__c>();
 
         List<Room__c> queried = [
-            SELECT Id, Sex__c, Parent_Room__c, Available_Places__c
+            SELECT Id, Sex__c, Parent_Room__c, Available_Places__c, Room_Leader__c
             FROM Room__c
             WHERE Id IN :roomIds
         ];
@@ -198,7 +202,7 @@ public without sharing class AccommodationRequestTriggerHandler extends TriggerH
         }
 
         List<Room__c> parentsAndSiblings = [
-            SELECT Id, Sex__c, Parent_Room__c, Available_Places__c
+            SELECT Id, Sex__c, Parent_Room__c, Available_Places__c, Room_Leader__c
             FROM Room__c
             WHERE Id IN :allRoomIds OR Parent_Room__c IN :allRoomIds
         ];
