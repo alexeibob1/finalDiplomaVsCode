@@ -116,7 +116,6 @@ export default class MaintenanceRequestForm extends LightningElement {
                 mode: 'dismissible' 
             });
 
-            // Optional reset form
             this.type = '';
             this.description = '';
             this.commonArea = '';

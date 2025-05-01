@@ -75,8 +75,6 @@ export default class DutyRequestModal extends LightningModal {
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const rows = [];
 
-        console.log('shifts', JSON.stringify(this.shifts));
-        console.log('existing', JSON.stringify(this.existingRequests));
     
         for (let day = 1; day <= daysInMonth; day++) {
             const dateObj = new Date(year, month, day);
@@ -97,7 +95,6 @@ export default class DutyRequestModal extends LightningModal {
             rows.push(row);
         }
 
-        console.log('rows', JSON.stringify(rows));
     
         this.calendarData = rows;
     }
@@ -126,7 +123,6 @@ export default class DutyRequestModal extends LightningModal {
         }
 
         const { dutyDate, dutyShiftId } = this.selectedRequest;
-        console.log('2', dutyDate, dutyShiftId);
 
         try {
             this.isLoading = true;
@@ -134,7 +130,6 @@ export default class DutyRequestModal extends LightningModal {
                 dutyDate: dutyDate,
                 monthDutyShiftId: dutyShiftId
             });
-            console.log('has conflist', hasConflict);
             if (hasConflict) {
                 this.showConflictModal = true;
             } else {

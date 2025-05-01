@@ -3,7 +3,6 @@ public with sharing class RoomSelectionController {
     public static List<Room__c> getAvailableRooms(String studentGender, Integer pageNumber, Integer pageSize) {
         Integer offset = (pageNumber - 1) * pageSize;
 
-        // Query child rooms (rooms that have a parent)
         Map<Id, Room__c> childRooms = new Map<Id, Room__c>([
             SELECT Id, Name, Available_Places__c, Capacity__c, Sex__c, Dormitory__r.Name, Parent_Room__c 
             FROM Room__c 
@@ -19,7 +18,6 @@ public with sharing class RoomSelectionController {
             parentRoomsIds.add(childRoom.Parent_Room__c);
         }
 
-        // If we don't have enough child rooms, fetch parent rooms with no children
         Integer remaining = pageSize - childRooms.keySet().size();
         List<Room__c> parentRooms = new List<Room__c>();
         if (remaining > 0) {

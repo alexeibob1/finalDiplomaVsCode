@@ -107,8 +107,6 @@ export default class DutyMonthList extends LightningElement {
                 studentId: this.studentId,
                 monthDutyId: this.selectedMonthDutyId
             });
-
-            // this.showModal = true;
         }
     }
 

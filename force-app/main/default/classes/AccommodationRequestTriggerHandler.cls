@@ -90,7 +90,6 @@ public without sharing class AccommodationRequestTriggerHandler extends TriggerH
         Map<Id, Room__c> rooms = getRoomsWithParent(roomIds);
         Map<Id, Contact> students = getStudentsById(studentIds);
 
-        // Step 1: Clear Contact.Room__c
         List<Contact> contactsToUpdate = new List<Contact>();
         for (Contact contact : students.values()) {
             contactsToUpdate.add(new Contact(
@@ -102,7 +101,6 @@ public without sharing class AccommodationRequestTriggerHandler extends TriggerH
             update contactsToUpdate;
         }
 
-        // Step 2: Increment Available_Places__c
         for (Accomodation_Request__c req : evictedRequests) {
             if (req.Room__c != null && rooms.containsKey(req.Room__c)) {
                 Room__c r = rooms.get(req.Room__c);
@@ -114,7 +112,6 @@ public without sharing class AccommodationRequestTriggerHandler extends TriggerH
             }
         }
 
-        // Step 3: Clear Sex__c only for truly empty rooms
         Set<Id> parentRoomIdsToClear = new Set<Id>();
         Map<Id, Room__c> allRoomsToClearSexMap = new Map<Id, Room__c>();
 
@@ -152,11 +149,9 @@ public without sharing class AccommodationRequestTriggerHandler extends TriggerH
         }
 
         if (!allRoomsToClearSexMap.isEmpty()) {
-            update allRoomsToClearSexMap.values(); // ✅ No duplicate Ids!
+            update allRoomsToClearSexMap.values(); 
         }
     }
-
-    // ---------------------- Helper Methods ----------------------
 
     private List<Accomodation_Request__c> getNewlySettledRequests() {
         List<Accomodation_Request__c> result = new List<Accomodation_Request__c>();
