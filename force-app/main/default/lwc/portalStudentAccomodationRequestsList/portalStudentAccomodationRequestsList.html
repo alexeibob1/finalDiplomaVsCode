@@ -1,8 +1,6 @@
 <template>
     <template if:true={error}>
-        <div class="slds-m-around_medium slds-text-color_error">
-            ⚠ {error}
-        </div>
+        <div class="slds-text-color_error slds-m-around_medium">⚠ {error}</div>
     </template>
 
     <template if:true={requests.length}>
@@ -11,13 +9,31 @@
             data={requests}
             columns={columns}
             hide-checkbox-column="true"
-            column-widths-mode="fixed"  
+            column-widths-mode="fixed"
             suppress-bottom-bar="true"  
             class="custom-datatable"
             onrowaction={handleRowAction}
             resize-column-disabled
         >
         </lightning-datatable>
+
+        <div class="slds-m-top_medium slds-text-align_center">
+            <lightning-button
+                label="Назад"
+                onclick={handlePrev}
+                disabled={isFirstPage}
+                class="slds-m-right_small"
+            ></lightning-button>
+
+            <span>Страница {currentPage} из {totalPages}</span>
+
+            <lightning-button
+                label="Вперёд"
+                onclick={handleNext}
+                disabled={isLastPage}
+                class="slds-m-left_small"
+            ></lightning-button>
+        </div>
     </template>
 
     <template if:false={requests.length}>

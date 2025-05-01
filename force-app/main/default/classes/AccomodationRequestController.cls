@@ -133,5 +133,40 @@ public without sharing class AccomodationRequestController {
         }
     }
 
+    public class AccomodationRequestWrapper {
+        @AuraEnabled public List<Accomodation_Request__c> records;
+        @AuraEnabled public Integer total;
+    }
+    
+    @AuraEnabled
+    public static AccomodationRequestWrapper getStudentRequestsPaginated(Integer offset, Integer pageSize) {
+        try {
+            Contact studentContact = StudentDAO.getCurrentUserContact();
+    
+            List<Accomodation_Request__c> records = [
+                SELECT Id, Name, CreatedDate, Status__c, Room__c, Room__r.Name, Room__r.Dormitory__r.Name, Note__c, Place_Of_Settlement__c
+                FROM Accomodation_Request__c
+                WHERE Student_Contact__c = :studentContact.Id
+                ORDER BY CreatedDate DESC
+                LIMIT :pageSize
+                OFFSET :offset
+            ];
+    
+            Integer total = [
+                SELECT COUNT()
+                FROM Accomodation_Request__c
+                WHERE Student_Contact__c = :studentContact.Id
+            ];
+    
+            AccomodationRequestWrapper wrapper = new AccomodationRequestWrapper();
+            wrapper.records = records;
+            wrapper.total = total;
+            return wrapper;
+    
+        } catch (Exception e) {
+            throw new AccomodationRequestException('Ошибка загрузки заявок: ' + e.getMessage());
+        }
+    }
+
     public class AccomodationRequestException extends Exception {}
 }

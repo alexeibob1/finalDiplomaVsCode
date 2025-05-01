@@ -1,5 +1,5 @@
 import { LightningElement, api } from 'lwc';
-import getStudentRequests from '@salesforce/apex/AccomodationRequestController.getStudentRequests';
+import getRequestsPaginated from '@salesforce/apex/AccomodationRequestController.getStudentRequestsPaginated';
 import cancelRequest from '@salesforce/apex/AccomodationRequestController.cancelRequest';
 import Toast from 'lightning/toast';
 
@@ -32,26 +32,36 @@ const COLUMNS = [
 
 export default class PortalStudentAccomodationRequestsList extends LightningElement {
     requests = [];
-    error = undefined;
-
     columns = COLUMNS;
+    error;
+    
+    pageSize = 5;
+    currentPage = 1;
+    totalRecords = 0;
+
+    get totalPages() {
+        return Math.ceil(this.totalRecords / this.pageSize);
+    }
 
     connectedCallback() {
         this.fetchRequests();
     }
 
-    @api
     async fetchRequests() {
-        this.dispatchEvent(new CustomEvent('loading', { detail: { isLoading: true } })); 
+        this.dispatchEvent(new CustomEvent('loading', { detail: { isLoading: true } }));
+
+        const offset = (this.currentPage - 1) * this.pageSize;
 
         try {
-            this.requests = await getStudentRequests();
+            const result = await getRequestsPaginated({ offset, pageSize: this.pageSize });
+            this.requests = result.records;
+            this.totalRecords = result.total;
             this.error = undefined;
-        } catch (error) {
-            this.error = error.body.message;
+        } catch (e) {
             this.requests = [];
+            this.error = e.body?.message || e.message;
         } finally {
-            this.dispatchEvent(new CustomEvent('loading', { detail: { isLoading: false } })); 
+            this.dispatchEvent(new CustomEvent('loading', { detail: { isLoading: false } }));
         }
     }
 
@@ -63,12 +73,33 @@ export default class PortalStudentAccomodationRequestsList extends LightningElem
             try {
                 await cancelRequest({ requestId: row.Id });
                 this.fetchRequests();
-                this.dispatchEvent(new CustomEvent('requestcancelled')); 
-                this.showToast('Успешно', 'Заявка успешно отменена', 'success');
-            } catch (error) {
-                this.showToast('Ошибка', error.body.message, 'error');
+                this.showToast('Успешно', 'Заявка отменена', 'success');
+            } catch (e) {
+                this.showToast('Ошибка', e.body?.message || e.message, 'error');
             }
         }
+    }
+
+    handleNext() {
+        if (this.currentPage < this.totalPages) {
+            this.currentPage++;
+            this.fetchRequests();
+        }
+    }
+
+    handlePrev() {
+        if (this.currentPage > 1) {
+            this.currentPage--;
+            this.fetchRequests();
+        }
+    }
+
+    get isFirstPage() {
+        return this.currentPage === 1;
+    }
+    
+    get isLastPage() {
+        return this.currentPage >= this.totalPages;
     }
 
     showToast(label, message, variant) {
