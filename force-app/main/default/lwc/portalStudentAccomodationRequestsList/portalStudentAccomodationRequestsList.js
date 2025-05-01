@@ -74,6 +74,7 @@ export default class PortalStudentAccomodationRequestsList extends LightningElem
                 await cancelRequest({ requestId: row.Id });
                 this.fetchRequests();
                 this.showToast('Успешно', 'Заявка отменена', 'success');
+                this.dispatchEvent(new CustomEvent('requestcancelled'));
             } catch (e) {
                 this.showToast('Ошибка', e.body?.message || e.message, 'error');
             }
