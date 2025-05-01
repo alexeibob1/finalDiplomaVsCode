@@ -33,7 +33,7 @@ public without sharing class AccomodationRequestController {
             Contact studentContact = StudentDAO.getCurrentUserContact();
 
             return [
-                SELECT Id, Name, CreatedDate, toLabel(Status__c), Room__c
+                SELECT Id, Name, CreatedDate, Status__c, Room__c, Room__r.Name, Room__r.Dormitory__r.Name, Note__c, Place_Of_Settlement__c
                 FROM Accomodation_Request__c
                 WHERE Student_Contact__c = :studentContact.Id
                 ORDER BY CreatedDate DESC

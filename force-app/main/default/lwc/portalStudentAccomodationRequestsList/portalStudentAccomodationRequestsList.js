@@ -16,6 +16,14 @@ const COLUMNS = [
         }
     },
     { label: 'Статус', fieldName: 'Status__c', sortable: false },
+    { label: 'Место заселения', fieldName: 'Place_Of_Settlement__c', sortable: false },
+    {
+        label: 'Примечание',
+        fieldName: 'Note__c',
+        type: 'text',
+        wrapText: true,
+        sortable: false
+    },
     {
         type: 'action',
         typeAttributes: { rowActions: actions }
