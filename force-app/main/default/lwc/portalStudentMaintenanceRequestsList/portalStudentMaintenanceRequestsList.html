@@ -14,6 +14,20 @@
             class="custom-datatable"
             resize-column-disabled>
         </lightning-datatable>
+
+        <div class="slds-m-top_medium slds-text-align_center">
+            <lightning-button 
+                label="Назад" 
+                onclick={handlePrevious} 
+                disabled={isFirstPage}>
+            </lightning-button>
+            <span class="slds-m-horizontal_small">Страница {currentPage} из {totalPages}</span>
+            <lightning-button 
+                label="Вперёд" 
+                onclick={handleNext} 
+                disabled={isLastPage}>
+            </lightning-button>
+        </div>
     </template>
 
     <template if:false={requests.length}>

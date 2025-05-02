@@ -48,13 +48,28 @@ public without sharing class MaintenanceRequestController {
     }
 
     @AuraEnabled
-    public static List<Maintenance_Request__c> getStudentMaintenanceRequests() {
+    public static Map<String, Object> getStudentMaintenanceRequests(Integer pageSize, Integer pageNumber) {
         Id studentId = StudentDAO.getCurrentUserContact().Id;
-        return [
-            SELECT Id, Name, CreatedDate, Location__c, Status__c
+
+        Integer offset = (pageNumber - 1) * pageSize;
+
+        List<Maintenance_Request__c> requests = [
+            SELECT Id, Name, CreatedDate, Location__c, Status__c, Type__c, Description__c
             FROM Maintenance_Request__c
             WHERE Student_Contact__c = :studentId
             ORDER BY CreatedDate DESC
+            LIMIT :pageSize OFFSET :offset
         ];
+
+        Integer totalRecords = [
+            SELECT COUNT()
+            FROM Maintenance_Request__c
+            WHERE Student_Contact__c = :studentId
+        ];
+
+        return new Map<String, Object>{
+            'requests' => requests,
+            'total' => totalRecords
+        };
     }
 }
