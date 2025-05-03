@@ -18,6 +18,39 @@
                         {hoursText}
                     </p>
                 </div>
+
+                <template if:true={hasData}>
+                    <lightning-datatable
+                        key-field="Id"
+                        data={records}
+                        columns={columns}
+                        hide-checkbox-column
+                    ></lightning-datatable>
+                
+                    <div class="slds-p-top_medium slds-align_absolute-center">
+                        <lightning-button 
+                            label="Назад"
+                            onclick={handlePrev}
+                            disabled={isFirstPage}
+                            class="slds-m-right_small"
+                        ></lightning-button>
+                
+                        <span>Страница {currentPageDisplay} из {totalPages}</span>
+                
+                        <lightning-button 
+                            label="Вперёд"
+                            onclick={handleNext}
+                            disabled={isLastPage}
+                            class="slds-m-left_small"
+                        ></lightning-button>
+                    </div>
+                </template>
+                
+                <template if:false={hasData}>
+                    <div class="slds-text-align_center slds-p-around_medium">
+                        У вас пока нет записей за текущий учебный год.
+                    </div>
+                </template>
             </template>
         </template>
     </lightning-card>

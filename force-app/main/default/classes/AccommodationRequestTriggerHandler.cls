@@ -27,6 +27,7 @@ public without sharing class AccommodationRequestTriggerHandler extends TriggerH
 
         Map<Id, Room__c> rooms = getRoomsWithParent(roomIds);
         Map<Id, Contact> students = getStudentsWithSex(studentIds);
+        AccountSharingService.shareDormitoryAccountsWithStudents(students.values());
 
         List<Room__c> roomsToUpdate = new List<Room__c>();
 
@@ -97,6 +98,9 @@ public without sharing class AccommodationRequestTriggerHandler extends TriggerH
                 Room__c = null
             ));
         }
+
+        AccountSharingService.removeDormitoryAccountShares(students.values());
+
         if (!contactsToUpdate.isEmpty()) {
             update contactsToUpdate;
         }
