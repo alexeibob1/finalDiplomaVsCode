@@ -42,7 +42,8 @@ public without sharing class StudentDAO {
             Contact studentContact = [
                 SELECT Id,
                     Sex__c, Room__c, Room__r.Floor__c,
-                    Room__r.Name, Room__r.Dormitory__c
+                    Room__r.Name, Room__r.Dormitory__c,
+                    Current_Study_Year_Hours__c
                 FROM Contact
                 WHERE Id = :contactId
                 LIMIT 1

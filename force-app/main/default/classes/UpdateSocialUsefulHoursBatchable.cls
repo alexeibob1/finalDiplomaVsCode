@@ -3,14 +3,9 @@ public class UpdateSocialUsefulHoursBatchable implements Database.Batchable<sObj
     Date endDate;
 
     public UpdateSocialUsefulHoursBatchable() {
-        Study_Year__mdt currentYear = [
-            SELECT Start_Date__c, End_Date__c 
-            FROM Study_Year__mdt 
-            WHERE Is_Current__c = TRUE 
-            LIMIT 1
-        ];
-        startDate = currentYear.Start_Date__c;
-        endDate = currentYear.End_Date__c;
+        StudyYearUtils.StudyYearRange range = StudyYearUtils.getCurrentStudyYearRange();
+        startDate = range.startDate;
+        endDate = range.endDate;
     }
 
     public void execute(SchedulableContext sc) {

@@ -18,15 +18,9 @@ public with sharing class RecalculateStudyHoursActionController {
 
         Id contactId = personAccObj.PersonContact.Id;
 
-        Study_Year__mdt year = [
-            SELECT Start_Date__c, End_Date__c 
-            FROM Study_Year__mdt 
-            WHERE Is_Current__c = TRUE 
-            LIMIT 1
-        ];
-
-        Date startDate = year.Start_Date__c;
-        Date endDate = year.End_Date__c;
+        StudyYearUtils.StudyYearRange range = StudyYearUtils.getCurrentStudyYearRange();
+        Date startDate = range.startDate;
+        Date endDate = range.endDate;
 
         AggregateResult[] results = [
             SELECT Student_Contact__c Id, SUM(Hours__c) total 
