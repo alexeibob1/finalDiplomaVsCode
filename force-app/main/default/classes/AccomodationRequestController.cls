@@ -126,7 +126,7 @@ public without sharing class AccomodationRequestController {
 
             selectedRoom.Available_Places__c -= 1;
 
-            update new List<SObject> { request, studentContact, selectedRoom };
+            update new List<SObject> { studentContact, request, selectedRoom };
 
         } catch (Exception e) {
             throw new AccomodationRequestException('Ошибка при заселении: ' + e.getMessage());

@@ -2,11 +2,17 @@ public class AccountSharingService {
     public static void shareDormitoryAccountsWithStudents(List<Contact> contacts) {
         Map<Id, Id> contactToAccount = new Map<Id, Id>();
 
+        LOGGER.info('1 ' + contacts);
+        System.debug('1 ' + contacts);
+
         for (Contact c : contacts) {
             if (c.Room__r != null && c.Room__r.Dormitory__c != null) {
                 contactToAccount.put(c.Id, c.Room__r.Dormitory__c);
             }
         }
+
+        LOGGER.info('2 ' + contactToAccount);
+        System.debug('2 ' + contactToAccount);
 
         if (contactToAccount.isEmpty()) return;
 
@@ -30,6 +36,9 @@ public class AccountSharingService {
         }
 
         List<AccountShare> sharesToInsert = new List<AccountShare>();
+
+        LOGGER.info('3 ' + sharesToInsert);
+        System.debug('3 ' + sharesToInsert);
         for (Id contactId : contactToAccount.keySet()) {
             User user = contactToUser.get(contactId);
             if (user == null) continue;
@@ -48,6 +57,8 @@ public class AccountSharingService {
         if (!sharesToInsert.isEmpty()) {
             insert sharesToInsert;
         }
+
+        LOGGER.saveLog();
     }
 
     public static void removeDormitoryAccountShares(List<Contact> contacts) {

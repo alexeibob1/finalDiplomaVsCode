@@ -26,7 +26,7 @@ public without sharing class AccommodationRequestTriggerHandler extends TriggerH
         }
 
         Map<Id, Room__c> rooms = getRoomsWithParent(roomIds);
-        Map<Id, Contact> students = getStudentsWithSex(studentIds);
+        Map<Id, Contact> students = StudentDAO.getContactsByIds(studentIds);
         AccountSharingService.shareDormitoryAccountsWithStudents(students.values());
 
         List<Room__c> roomsToUpdate = new List<Room__c>();
@@ -89,7 +89,7 @@ public without sharing class AccommodationRequestTriggerHandler extends TriggerH
         }
 
         Map<Id, Room__c> rooms = getRoomsWithParent(roomIds);
-        Map<Id, Contact> students = getStudentsById(studentIds);
+        Map<Id, Contact> students = StudentDAO.getContactsByIds(studentIds);
 
         List<Contact> contactsToUpdate = new List<Contact>();
         for (Contact contact : students.values()) {
@@ -216,21 +216,5 @@ public without sharing class AccommodationRequestTriggerHandler extends TriggerH
         }
 
         return rooms;
-    }
-
-    private Map<Id, Contact> getStudentsWithSex(Set<Id> studentIds) {
-        return new Map<Id, Contact>([
-            SELECT Id, Sex__c
-            FROM Contact
-            WHERE Id IN :studentIds
-        ]);
-    }
-
-    private Map<Id, Contact> getStudentsById(Set<Id> studentIds) {
-        return new Map<Id, Contact>([
-            SELECT Id
-            FROM Contact
-            WHERE Id IN :studentIds
-        ]);
     }
 }

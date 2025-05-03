@@ -54,4 +54,12 @@ public without sharing class StudentDAO {
             throw new AuraHandledException('Failed to retrieve student contact: ' + e.getMessage());
         }
     }
+
+    public static Map<Id, Contact> getContactsByIds(Set<Id> contactIds) {
+        return new Map<Id, Contact>([
+            SELECT Id, Sex__c, Room__c, Room__r.Dormitory__c
+            FROM Contact
+            WHERE Id IN :contactIds
+        ]);
+    }
 }
