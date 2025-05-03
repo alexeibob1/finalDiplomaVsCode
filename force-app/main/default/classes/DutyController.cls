@@ -19,7 +19,7 @@ public without sharing class DutyController {
         return [
             SELECT Id, Name, FX_Duty_Month__c, FX_Duty_Year__c, Duty_Month_Year__c, Floor__c, Is_Registration_Active__c
             FROM Month_Duty__c
-            WHERE Floor__c = :student.Room__r.Floor__c AND Dormitory__c = :student.Room__r.Dormitory__c
+            WHERE Dormitory__c = :student.Room__r.Dormitory__c
                 AND Is_Registration_Active__c = true
             ORDER BY Duty_Month_Year__c DESC
             LIMIT :pageSize OFFSET :offsetVal
@@ -44,7 +44,7 @@ public without sharing class DutyController {
         return [
             SELECT COUNT()
             FROM Month_Duty__c
-            WHERE Floor__c = :student.Room__r.Floor__c AND Dormitory__c = :student.Room__r.Dormitory__c
+            WHERE Dormitory__c = :student.Room__r.Dormitory__c
                 AND Is_Registration_Active__c = true
         ];
     }
