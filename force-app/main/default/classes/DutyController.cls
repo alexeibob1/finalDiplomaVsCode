@@ -180,7 +180,7 @@ public without sharing class DutyController {
                 Month_Duty__r.FX_Duty_Month__c, Month_Duty__r.FX_Duty_Year__c,
                 Month_Duty__r.Floor__c, Month_Duty__r.Is_Registration_Active__c
             FROM Duty_Request__c
-            WHERE Student_Contact__c = :studentId
+            WHERE Student_Contact__c = :studentId AND Duty_Date__c >= TODAY
             ORDER BY Duty_Date__c ASC
             LIMIT :pageSize OFFSET :offsetVal
         ];
