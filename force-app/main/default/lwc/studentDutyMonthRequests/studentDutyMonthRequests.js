@@ -3,6 +3,7 @@ import getStudentDutyRequests from '@salesforce/apex/DutyController.getStudentDu
 import deleteDutyRequest from '@salesforce/apex/DutyController.deleteDutyRequest';
 import getCurrentUserContact from '@salesforce/apex/StudentDAO.getCurrentUserContact';
 import Toast from 'lightning/toast';
+import ConfirmationModal from 'c/confirmationModal';
 
 const PAGE_SIZE = 5;
 
@@ -86,13 +87,23 @@ export default class StudentDutyMonthRequests extends LightningElement {
     async handleDelete(event) {
         const recordId = event.currentTarget.dataset.id;
 
-        try {
-            await deleteDutyRequest({ requestId: recordId });
-            Toast.show({ label: 'Успешно', message: 'Заявка удалена', variant: 'success' });
-            this.loadRequests();
-        } catch (e) {
-            console.error('Ошибка при удалении заявки', e);
-            Toast.show({ label: 'Ошибка', message: 'Не удалось удалить заявку', variant: 'error' });
+        const result = await ConfirmationModal.open({
+            size: 'medium',
+            title: 'Подтверждение заявки',
+            message: 'Вы уверены, что хотите удалить заявку на дежурство?',
+            confirmLabel: 'Подтвердить',
+            cancelLabel: 'Отмена'
+        });
+
+        if (result) {
+            try {
+                await deleteDutyRequest({ requestId: recordId });
+                Toast.show({ label: 'Успешно', message: 'Заявка удалена', variant: 'success' });
+                this.loadRequests();
+            } catch (e) {
+                console.error('Ошибка при удалении заявки', e);
+                Toast.show({ label: 'Ошибка', message: 'Не удалось удалить заявку', variant: 'error' });
+            }
         }
     }
 

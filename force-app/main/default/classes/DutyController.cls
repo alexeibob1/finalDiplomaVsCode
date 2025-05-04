@@ -175,13 +175,13 @@ public without sharing class DutyController {
         Integer offsetVal = (pageNumber - 1) * pageSize;
     
         List<Duty_Request__c> requests = [
-            SELECT Id, Duty_Date__c, 
+            SELECT Id, Duty_Date__c, Approved__c,
                 Month_Duty_Shift__r.Duty_Shift__r.FX_Display_Name__c,
                 Month_Duty__r.FX_Duty_Month__c, Month_Duty__r.FX_Duty_Year__c,
-                Month_Duty__r.Floor__c
+                Month_Duty__r.Floor__c, Month_Duty__r.Is_Registration_Active__c
             FROM Duty_Request__c
             WHERE Student_Contact__c = :studentId
-            ORDER BY Duty_Date__c DESC
+            ORDER BY Duty_Date__c ASC
             LIMIT :pageSize OFFSET :offsetVal
         ];
     
@@ -205,16 +205,15 @@ public without sharing class DutyController {
         }
 
         Duty_Request__c toDelete = [
-            SELECT Id, Student_Contact__c
+            SELECT Id, Student_Contact__c, Month_Duty__r.Is_Registration_Active__c, Approved__c
             FROM Duty_Request__c
             WHERE Id = :requestId
             LIMIT 1
         ];
 
-        // Optional: block deletion of already processed requests
-        // if (toDelete.Status__c != 'Ожидает') {
-        //     throw new AuraHandledException('Нельзя удалить заявку со статусом "' + toDelete.Status__c + '"');
-        // }
+        if (toDelete.Approved__c) {
+            throw new AuraHandledException('Заявка уже утверждена. Для поиска замены обратитесь к воспитателю.');
+        }
 
         delete toDelete;
     }
