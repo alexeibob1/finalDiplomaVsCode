@@ -1,0 +1,60 @@
+<template>
+    <lightning-card title="Мои заявки на дежурства">
+        <template if:true={error}>
+            <div class="slds-text-color_error slds-m-around_medium">
+                ⚠ {error}
+            </div>
+        </template>
+
+        <template if:true={requests.length}>
+            <div class="custom-table slds-scrollable_x">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                    <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Смена</th>
+                            <th>Месяц</th>
+                            <th>Год</th>
+                            <th>Этаж</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={requests} for:item="item">
+                            <tr key={item.Id}>
+                                <td>{item.Duty_Date__c}</td>
+                                <td>{item.Month_Duty_Shift__r.Duty_Shift__r.FX_Display_Name__c}</td>
+                                <td>{item.Month_Duty__r.FX_Duty_Month__c}</td>
+                                <td>{item.Month_Duty__r.FX_Duty_Year__c}</td>
+                                <td>{item.Month_Duty__r.Floor__c}</td>
+                                <td>
+                                    <lightning-button 
+                                        variant="destructive" 
+                                        icon-name="utility:delete"
+                                        title="Удалить"
+                                        onclick={handleDelete}
+                                        data-id={item.Id}
+                                    ></lightning-button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="slds-m-top_medium slds-text-align_center">
+                <lightning-button-group>
+                    <lightning-button label="Назад" onclick={handlePrev} disabled={isFirstPage}></lightning-button>
+                    <span class="slds-m-horizontal_small">Страница {currentPage} из {totalPages}</span>
+                    <lightning-button label="Вперёд" onclick={handleNext} disabled={isLastPage}></lightning-button>
+                </lightning-button-group>
+            </div>
+        </template>
+
+        <template if:false={requests.length}>
+            <div class="slds-align_absolute-center slds-m-around_medium">
+                <p class="slds-text-body_regular">У вас пока нет заявок.</p>
+            </div>
+        </template>
+    </lightning-card>
+</template>

@@ -161,6 +161,64 @@ public without sharing class DutyController {
         ] > 0;
     }
 
+    public class StudentDutyRequestResult {
+        @AuraEnabled public List<Duty_Request__c> requests;
+        @AuraEnabled public Integer total;
+    }
+    
+    @AuraEnabled
+    public static StudentDutyRequestResult getStudentDutyRequests(Id studentId, Integer pageSize, Integer pageNumber) {
+        if (studentId == null) {
+            throw new AuraHandledException('Не указан studentId');
+        }
+    
+        Integer offsetVal = (pageNumber - 1) * pageSize;
+    
+        List<Duty_Request__c> requests = [
+            SELECT Id, Duty_Date__c, 
+                Month_Duty_Shift__r.Duty_Shift__r.FX_Display_Name__c,
+                Month_Duty__r.FX_Duty_Month__c, Month_Duty__r.FX_Duty_Year__c,
+                Month_Duty__r.Floor__c
+            FROM Duty_Request__c
+            WHERE Student_Contact__c = :studentId
+            ORDER BY Duty_Date__c DESC
+            LIMIT :pageSize OFFSET :offsetVal
+        ];
+    
+        Integer totalCount = [
+            SELECT COUNT()
+            FROM Duty_Request__c
+            WHERE Student_Contact__c = :studentId
+        ];
+    
+        StudentDutyRequestResult result = new StudentDutyRequestResult();
+        result.requests = requests;
+        result.total = totalCount;
+    
+        return result;
+    }
+
+    @AuraEnabled
+    public static void deleteDutyRequest(Id requestId) {
+        if (requestId == null) {
+            throw new AuraHandledException('Не указан идентификатор заявки');
+        }
+
+        Duty_Request__c toDelete = [
+            SELECT Id, Student_Contact__c
+            FROM Duty_Request__c
+            WHERE Id = :requestId
+            LIMIT 1
+        ];
+
+        // Optional: block deletion of already processed requests
+        // if (toDelete.Status__c != 'Ожидает') {
+        //     throw new AuraHandledException('Нельзя удалить заявку со статусом "' + toDelete.Status__c + '"');
+        // }
+
+        delete toDelete;
+    }
+
 
     public class DutyRequestWrapper {
         @AuraEnabled public Date dutyDate { get; set; }

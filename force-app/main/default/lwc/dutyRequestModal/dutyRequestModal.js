@@ -154,6 +154,7 @@ export default class DutyRequestModal extends LightningModal {
             });
     
             this.showSuccess('Заявка успешно отправлена');
+            this.dispatchEvent(new CustomEvent('requestsubmitted'));
             this.dispatchEvent(new CustomEvent('close'));
         } catch (err) {
             this.showError(err.body?.message || err.message);

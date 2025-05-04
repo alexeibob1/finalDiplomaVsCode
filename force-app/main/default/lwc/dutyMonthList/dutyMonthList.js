@@ -105,7 +105,10 @@ export default class DutyMonthList extends LightningElement {
             const result = await DutyModal.open({
                 size: 'large', 
                 studentId: this.studentId,
-                monthDutyId: this.selectedMonthDutyId
+                monthDutyId: this.selectedMonthDutyId,
+                onrequestsubmitted: () => {
+                    this.dispatchEvent(new CustomEvent('requestsubmitted'));
+                }
             });
         }
     }

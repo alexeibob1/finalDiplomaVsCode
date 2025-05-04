@@ -1,0 +1,17 @@
+<template>
+    <template if:true={isLoading}>
+        <div class="slds-align_absolute-center">
+            <lightning-spinner alternative-text="Загрузка..." size="large"></lightning-spinner>
+        </div>
+    </template>
+
+    <lightning-layout multiple-rows class="slds-m-around_medium">
+        <lightning-layout-item size="12" class="slds-m-bottom_medium">
+            <c-duty-month-list onloading={handleLoading} onrequestsubmitted={handleRequestSubmit}></c-duty-month-list>
+        </lightning-layout-item>
+
+        <lightning-layout-item size="12">
+            <c-student-duty-month-requests onloading={handleLoading}></c-student-duty-month-requests>
+        </lightning-layout-item>
+    </lightning-layout>
+</template>
