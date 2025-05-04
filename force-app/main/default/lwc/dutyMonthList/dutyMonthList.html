@@ -7,36 +7,38 @@
 
     <template if:false={isLoading}>
         <lightning-card title="Дежурства по этажу">
-            <lightning-datatable
-                key-field="Id"
-                data={duties}
-                columns={columns}
-                onrowaction={handleRowAction}
-                hide-checkbox-column="true">
-            </lightning-datatable>
+            <template if:true={hasDuties}>
+                    <lightning-datatable
+                    key-field="Id"
+                    data={duties}
+                    columns={columns}
+                    onrowaction={handleRowAction}
+                    hide-checkbox-column="true">
+                </lightning-datatable>
 
-            <div class="slds-m-top_medium slds-align_absolute-center">
-                <lightning-button-group>
-                    <lightning-button
-                        label="Назад"
-                        onclick={previousPage}
-                        disabled={disablePrev}>
-                    </lightning-button>
-                    <lightning-button
-                        label="Вперёд"
-                        onclick={nextPage}
-                        disabled={disableNext}>
-                    </lightning-button>
-                </lightning-button-group>
-            </div>
+                <div class="slds-m-top_medium slds-align_absolute-center">
+                    <lightning-button-group>
+                        <lightning-button
+                            label="Назад"
+                            onclick={previousPage}
+                            disabled={disablePrev}>
+                        </lightning-button>
+                        <lightning-button
+                            label="Вперёд"
+                            onclick={nextPage}
+                            disabled={disableNext}>
+                        </lightning-button>
+                    </lightning-button-group>
+                </div>
+            </template>
+            <template if:false={hasDuties}>
+                <div class="slds-align_absolute-center slds-m-around_medium">
+                    <p class="slds-text-body_regular">Нет доступных дежурств для записи.</p>
+                </div>
+            </template>
+           
         </lightning-card>
     </template>
 
-    <!-- <template if:true={showModal}>
-        <c-duty-request-modal
-            student-id={studentId}
-            month-duty-id={selectedMonthDutyId}
-            onclose={closeModal}>
-        </c-duty-request-modal>
-    </template> -->
+
 </template>

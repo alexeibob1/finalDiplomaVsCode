@@ -12,7 +12,7 @@ const COLUMNS = [
     { label: 'Месяц', fieldName: 'FX_Duty_Month__c' },
     { label: 'Год', fieldName: 'FX_Duty_Year__c' },
     { label: 'Этаж', fieldName: 'Floor__c', type: 'number' },
-    { label: 'Регистрация активна', fieldName: 'Is_Registration_Active__c', type: 'boolean' },
+    // { label: 'Регистрация активна', fieldName: 'Is_Registration_Active__c', type: 'boolean' },
     {
         type: 'action',
         typeAttributes: { rowActions : actions }
@@ -108,6 +108,10 @@ export default class DutyMonthList extends LightningElement {
                 monthDutyId: this.selectedMonthDutyId
             });
         }
+    }
+
+    get hasDuties() {
+        return this.duties && this.duties.length > 0;
     }
 
     closeModal() {
