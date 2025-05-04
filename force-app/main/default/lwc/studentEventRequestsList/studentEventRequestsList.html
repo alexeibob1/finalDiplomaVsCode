@@ -1,0 +1,46 @@
+<template>
+    <template if:true={error}>
+        <div class="slds-text-color_error slds-m-around_medium">
+            ⚠ {error}
+        </div>
+    </template>
+
+    <template if:true={requests.length}>
+        <div class="slds-box slds-box_xx-small">
+            <template for:each={requests} for:item="req">
+                <div key={req.Id} class="slds-m-bottom_small slds-grid slds-wrap slds-grid_align-spread">
+                    <div>
+                        <p><strong>{req.Event__r.Name}</strong> — {req.Event__r.Event_DateTime__c}</p>
+                        <!-- <p>Посетил: {req.Attended__c ? 'Да' : 'Нет'}</p> -->
+                    </div>
+                    <div>
+                        <template lwc:if={req.isDeletable}>
+                            <lightning-button
+                                label="Удалить"
+                                data-id={req.Id}
+                                variant="destructive"
+                                onclick={handleDelete}
+                            >
+                            </lightning-button>
+                        </template>
+                        <template lwc:else>
+                            <lightning-button
+                                label="Удалить"
+                                data-id={req.Id}
+                                variant="destructive"
+                                onclick={handleDelete}
+                                disabled
+                            >
+                            </lightning-button>
+                        </template>
+                        
+                    </div>
+                </div>
+            </template>
+        </div>
+    </template>
+
+    <template if:false={requests.length}>
+        <p class="slds-text-align_center slds-m-top_medium">Нет заявок на мероприятия</p>
+    </template>
+</template>

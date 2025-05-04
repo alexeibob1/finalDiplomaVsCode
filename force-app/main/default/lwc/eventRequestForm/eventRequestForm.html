@@ -1,0 +1,47 @@
+<template>
+    <template if:true={error}>
+        <div class="slds-text-color_error slds-m-around_medium">
+            ⚠ {error}
+        </div>
+    </template>
+
+    <template if:true={events.length}>
+        <div class="slds-box slds-box_xx-small">
+            <template for:each={events} for:item="event">
+                <div key={event.Id} class="slds-m-bottom_small slds-grid slds-wrap slds-grid_align-spread">
+                    <div>
+                        <p><strong>{event.Name}</strong> — {event.Event_Place__c}</p>
+                        <p>Дата: {event.Event_DateTime__c}</p>
+                        <p>Осталось мест: {event.Remaining_Spaces__c}</p>
+                    </div>
+                    <div>
+                        <template lwc:if={event.isActive}>
+                            <lightning-button
+                                label="Записаться"
+                                data-id={event.Id}
+                                variant="brand"
+                                onclick={handleSubmit}
+                            >
+                            </lightning-button>
+                        </template>
+                        <template lwc:else>
+                            <lightning-button
+                                label="Записаться"
+                                data-id={event.Id}
+                                variant="brand"
+                                onclick={handleSubmit}
+                                disabled
+                            >
+                            </lightning-button>
+                        </template>
+                        
+                    </div>
+                </div>
+            </template>
+        </div>
+    </template>
+
+    <template if:false={events.length}>
+        <p class="slds-text-align_center slds-m-top_medium">Нет доступных мероприятий</p>
+    </template>
+</template>

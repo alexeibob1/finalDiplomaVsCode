@@ -1,28 +1,42 @@
-public without sharing class EventController {
-    @AuraEnabled
-    public static List<Event__c> getAvailableDormitoryEvents() {
-        Contact studentContact = StudentDAO.getCurrentUserContact();
-        //TODO add filtering by study year as with ОПТ
-        List<Event__c> dormitoryEvents = [
-            SELECT Id, Name, Event_DateTime__c, Max_Students__c, Event_Place__c, Dormitory__c
-            FROM Event__c
-            WHERE Dormitory__c = :studentContact.Room__r.Dormitory__c
-        ];
+public with sharing class EventController {
+    @AuraEnabled(cacheable=true)
+    public static List<Event__c> getAvailableEventsForStudent() {
+        Contact student = StudentDAO.getCurrentUserContact();
 
-        return dormitoryEvents;
+        return [
+            SELECT Id, Name, Event_DateTime__c, Max_Students__c, Remaining_Spaces__c, Event_Place__c
+            FROM Event__c
+            WHERE Dormitory__c = :student.Room__r.Dormitory__c
+              AND Event_DateTime__c > :System.now()
+            ORDER BY Event_DateTime__c ASC
+        ];
     }
 
     @AuraEnabled
+    public static void createEventRequest(Id eventId) {
+        Contact student = StudentDAO.getCurrentUserContact();
+
+        Event_Request__c req = new Event_Request__c(
+            Event__c = eventId,
+            Student_Contact__c = student.Id
+        );
+        insert req;
+    }
+
+    @AuraEnabled(cacheable=true)
     public static List<Event_Request__c> getStudentEventRequests() {
-        Contact studentContact = StudentDAO.getCurrentUserContact();
+        Contact student = StudentDAO.getCurrentUserContact();
 
-        List<Event_Request__c> studentRequests = [
-            SELECT Id, Name,
-                Event__r.Name, Event__r.Event_DateTime__c
+        return [
+            SELECT Id, Name, Event__r.Name, Event__r.Event_DateTime__c, Attended__c
             FROM Event_Request__c
-            WHERE Student_Contact__c = :studentContact.Id
+            WHERE Student_Contact__c = :student.Id
+            ORDER BY Event__r.Event_DateTime__c DESC
         ];
+    }
 
-        return studentRequests;
+    @AuraEnabled
+    public static void deleteEventRequest(Id requestId) {
+        delete [SELECT Id FROM Event_Request__c WHERE Id = :requestId];
     }
 }
