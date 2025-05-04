@@ -1,12 +1,18 @@
 <template>
-    <lightning-card title="Мои заявки на дежурства">
+    <lightning-card title="Мои ближайшие дежурства">
         <template if:true={error}>
             <div class="slds-text-color_error slds-m-around_medium">
                 ⚠ {error}
             </div>
         </template>
 
-        <template if:true={requests.length}>
+        <div class="slds-p-around_medium slds-text-align_center">
+            <p class="slds-text-heading_medium">
+                Выполнено дежурств за учебный год: {dutiesCount}
+            </p>
+        </div>
+
+        <template if:true={hasRequests}>
             <div class="custom-table slds-scrollable_x">
                 <table class="slds-table slds-table_cell-buffer slds-table_bordered">
                     <thead>
@@ -16,7 +22,6 @@
                             <th>Месяц</th>
                             <th>Год</th>
                             <th>Этаж</th>
-                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -27,26 +32,6 @@
                                 <td>{item.Month_Duty__r.FX_Duty_Month__c}</td>
                                 <td>{item.Month_Duty__r.FX_Duty_Year__c}</td>
                                 <td>{item.Month_Duty__r.Floor__c}</td>
-                                <td>
-                                    <template lwc:if={item.Approved__c}>
-                                        <span title="Заявка уже утверждена. Для поиска замены обратитесь к воспитателю.">
-                                            <lightning-button 
-                                                variant="destructive" 
-                                                icon-name="utility:delete"
-                                                disabled
-                                            ></lightning-button>
-                                        </span>
-                                    </template>
-                                    <template lwc:else>
-                                        <lightning-button 
-                                            variant="destructive" 
-                                            icon-name="utility:delete"
-                                            title="Удалить"
-                                            onclick={handleDelete}
-                                            data-id={item.Id}
-                                        ></lightning-button>
-                                    </template>
-                                </td>
                             </tr>
                         </template>
                     </tbody>
@@ -68,9 +53,9 @@
             </div>
         </template>
 
-        <template if:false={requests.length}>
+        <template if:false={hasRequests}>
             <div class="slds-align_absolute-center slds-m-around_medium">
-                <p class="slds-text-body_regular">У вас пока нет заявок.</p>
+                <p class="slds-text-body_regular">У вас пока нет предстоящих дежурств.</p>
             </div>
         </template>
     </lightning-card>

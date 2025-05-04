@@ -43,7 +43,10 @@ export default class StudentDutyMonthRequests extends LightningElement {
                 pageSize: PAGE_SIZE,
                 pageNumber: this.currentPage
             });
-            this.requests = result.requests;
+            this.requests = result.requests.map(req => ({
+                ...req,
+                formattedDate: this.formatDate(req.Duty_Date__c)
+            }));
             this.totalCount = result.total;
             this.totalPages = Math.ceil(this.totalCount / PAGE_SIZE);
             this.error = null;
@@ -55,6 +58,15 @@ export default class StudentDutyMonthRequests extends LightningElement {
             this.dispatchLoading(false);
         }
     }
+
+    formatDate(dateString) {
+        const date = new Date(dateString);
+        return new Intl.DateTimeFormat('ru-RU', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        }).format(date);
+    }   
 
     dispatchLoading(isLoading) {
         this.dispatchEvent(new CustomEvent('loading', {

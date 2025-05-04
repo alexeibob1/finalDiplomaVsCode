@@ -181,7 +181,7 @@ public without sharing class DutyController {
                 Month_Duty__r.Floor__c, Month_Duty__r.Is_Registration_Active__c
             FROM Duty_Request__c
             WHERE Student_Contact__c = :studentId AND Duty_Date__c >= TODAY
-            ORDER BY Duty_Date__c ASC
+            ORDER BY Duty_Date__c ASC, Month_Duty_Shift__r.Duty_Shift__r.Start__c
             LIMIT :pageSize OFFSET :offsetVal
         ];
     
@@ -216,6 +216,47 @@ public without sharing class DutyController {
         }
 
         delete toDelete;
+    }
+
+    @AuraEnabled
+    public static StudentDutyRequestResult getApprovedUpcomingDuties(Integer pageSize, Integer pageNumber) {
+        if (pageSize == null || pageNumber == null || pageSize <= 0 || pageNumber < 0) {
+            throw new AuraHandledException('Неверные параметры пагинации.');
+        }
+
+        Contact student = StudentDAO.getCurrentUserContact();
+        if (student == null) {
+            throw new AuraHandledException('Не удалось определить текущего студента.');
+        }
+
+        Integer offsetVal = pageNumber * pageSize;
+
+        List<Duty_Request__c> duties = [
+            SELECT Id, Duty_Date__c, Approved__c,
+                Month_Duty_Shift__r.Duty_Shift__r.FX_Display_Name__c,
+                Month_Duty__r.FX_Duty_Month__c, Month_Duty__r.FX_Duty_Year__c,
+                Month_Duty__r.Floor__c
+            FROM Duty_Request__c
+            WHERE Student_Contact__c = :student.Id
+                AND Approved__c = TRUE
+                AND Duty_Date__c >= TODAY
+            ORDER BY Duty_Date__c ASC, Month_Duty_Shift__r.Duty_Shift__r.Start__c
+            LIMIT :pageSize OFFSET :offsetVal
+        ];
+
+        Integer total = [
+            SELECT COUNT()
+            FROM Duty_Request__c
+            WHERE Student_Contact__c = :student.Id
+            AND Approved__c = TRUE
+            AND Duty_Date__c >= :Date.today()
+        ];
+
+        StudentDutyRequestResult result = new StudentDutyRequestResult();
+        result.requests = duties;
+        result.total = total;
+
+        return result;
     }
 
 

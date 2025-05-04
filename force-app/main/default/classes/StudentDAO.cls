@@ -43,7 +43,7 @@ public without sharing class StudentDAO {
                 SELECT Id,
                     Sex__c, Room__c, Room__r.Floor__c,
                     Room__r.Name, Room__r.Dormitory__c,
-                    Current_Study_Year_Hours__c
+                    Current_Study_Year_Hours__c, Current_Study_Year_Duties__c
                 FROM Contact
                 WHERE Id = :contactId
                 LIMIT 1

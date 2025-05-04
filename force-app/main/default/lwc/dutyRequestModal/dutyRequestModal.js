@@ -71,10 +71,18 @@ export default class DutyRequestModal extends LightningModal {
         return `${year}-${month}-${day}`;
     }
 
+    formatDateRussian(dateString) {
+        const date = new Date(dateString);
+        return new Intl.DateTimeFormat('ru-RU', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        }).format(date);
+    }
+
     generateCalendarData(year, month) {
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const rows = [];
-
     
         for (let day = 1; day <= daysInMonth; day++) {
             const dateObj = new Date(year, month, day);
@@ -82,6 +90,7 @@ export default class DutyRequestModal extends LightningModal {
     
             const row = {
                 date: dateISO,
+                formattedDate: this.formatDateRussian(dateISO), // 👈 Add this
                 cells: this.shifts.map(shift => {
                     const key = `${dateISO}-${shift.Id}`;
                     return {
@@ -94,7 +103,6 @@ export default class DutyRequestModal extends LightningModal {
             };
             rows.push(row);
         }
-
     
         this.calendarData = rows;
     }

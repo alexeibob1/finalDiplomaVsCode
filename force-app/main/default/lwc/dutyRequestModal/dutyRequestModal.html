@@ -31,7 +31,7 @@
                         <tbody>
                             <template for:each={calendarData} for:item="row">
                                 <tr key={row.date}>
-                                    <td>{row.date}</td>
+                                    <td>{row.formattedDate}</td>
                                     <template for:each={row.cells} for:item="cell">
                                         <td key={cell.key}>
                                             <input 
