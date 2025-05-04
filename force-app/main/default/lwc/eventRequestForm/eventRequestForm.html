@@ -7,37 +7,60 @@
 
     <template if:true={events.length}>
         <div class="slds-box slds-box_xx-small">
-            <template for:each={events} for:item="event">
-                <div key={event.Id} class="slds-m-bottom_small slds-grid slds-wrap slds-grid_align-spread">
-                    <div>
-                        <p><strong>{event.Name}</strong> — {event.Event_Place__c}</p>
-                        <p>Дата: {event.Event_DateTime__c}</p>
-                        <p>Осталось мест: {event.Remaining_Spaces__c}</p>
-                    </div>
-                    <div>
-                        <template lwc:if={event.isActive}>
-                            <lightning-button
-                                label="Записаться"
-                                data-id={event.Id}
-                                variant="brand"
-                                onclick={handleSubmit}
-                            >
-                            </lightning-button>
-                        </template>
-                        <template lwc:else>
-                            <lightning-button
-                                label="Записаться"
-                                data-id={event.Id}
-                                variant="brand"
-                                onclick={handleSubmit}
-                                disabled
-                            >
-                            </lightning-button>
-                        </template>
-                        
-                    </div>
-                </div>
-            </template>
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                <thead>
+                    <tr>
+                        <th>Название</th>
+                        <th>Место</th>
+                        <th>Дата</th>
+                        <th>Осталось мест</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template for:each={events} for:item="event">
+                        <tr key={event.Id}>
+                            <td>{event.Name}</td>
+                            <td>{event.Event_Place__c}</td>
+                            <td>{event.Event_DateTime__c}</td>
+                            <td>{event.Remaining_Spaces__c}</td>
+                            <td>
+                                <template lwc:if={event.isActive}>
+                                    <lightning-button
+                                        label="Записаться"
+                                        data-id={event.Id}
+                                        variant="brand"
+                                        onclick={handleSubmit}
+                                    ></lightning-button>
+                                </template>
+                                <template lwc:else>
+                                    <lightning-button
+                                        label="Записаться"
+                                        data-id={event.Id}
+                                        variant="brand"
+                                        onclick={handleSubmit}
+                                        disabled
+                                    ></lightning-button>
+                                </template>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+
+            <div class="slds-m-top_medium slds-grid slds-grid_align-center">
+                <lightning-button 
+                    label="Назад" 
+                    onclick={prevPage}
+                    disabled={isFirstPage}
+                    class="slds-m-right_small">
+                </lightning-button>
+                <lightning-button 
+                    label="Вперёд" 
+                    onclick={nextPage}
+                    disabled={isLastPage}>
+                </lightning-button>
+            </div>
         </div>
     </template>
 

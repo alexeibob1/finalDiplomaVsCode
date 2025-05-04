@@ -1,12 +1,24 @@
-import { LightningElement, track, api } from 'lwc';
+import { LightningElement, track } from 'lwc';
 import getAvailableEventsForStudent from '@salesforce/apex/EventController.getAvailableEventsForStudent';
 import createEventRequest from '@salesforce/apex/EventController.createEventRequest';
 import ConfirmationModal from 'c/confirmationModal';
 import Toast from 'lightning/toast';
 
+const PAGE_SIZE = 5;
+
 export default class EventRequestForm extends LightningElement {
     @track events = [];
     @track error;
+    @track currentPage = 1;
+    @track total = 0;
+
+    get isFirstPage() {
+        return this.currentPage === 1;
+    }
+
+    get isLastPage() {
+        return this.currentPage * PAGE_SIZE >= this.total;
+    }
 
     connectedCallback() {
         this.fetchEvents();
@@ -15,17 +27,35 @@ export default class EventRequestForm extends LightningElement {
     async fetchEvents() {
         this.dispatchEvent(new CustomEvent('loading', { detail: { isLoading: true } }));
         try {
-            const result = await getAvailableEventsForStudent();
+            const result = await getAvailableEventsForStudent({
+                pageSize: PAGE_SIZE,
+                pageNumber: this.currentPage
+            });
 
-            this.events = result.map(event => ({
+            this.events = result.events.map(event => ({
                 ...event,
-                isActive: this.isDeletable(event.Remaining_Spaces__c > 0)
+                isActive: event.Remaining_Spaces__c > 0
             }));
+            this.total = result.total;
             this.error = null;
         } catch (e) {
             this.error = e.body?.message || 'Ошибка загрузки мероприятий';
         } finally {
             this.dispatchEvent(new CustomEvent('loading', { detail: { isLoading: false } }));
+        }
+    }
+
+    nextPage() {
+        if (!this.isLastPage) {
+            this.currentPage++;
+            this.fetchEvents();
+        }
+    }
+
+    prevPage() {
+        if (!this.isFirstPage) {
+            this.currentPage--;
+            this.fetchEvents();
         }
     }
 

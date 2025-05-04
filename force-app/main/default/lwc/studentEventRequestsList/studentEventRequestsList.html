@@ -7,36 +7,42 @@
 
     <template if:true={requests.length}>
         <div class="slds-box slds-box_xx-small">
-            <template for:each={requests} for:item="req">
-                <div key={req.Id} class="slds-m-bottom_small slds-grid slds-wrap slds-grid_align-spread">
-                    <div>
-                        <p><strong>{req.Event__r.Name}</strong> — {req.Event__r.Event_DateTime__c}</p>
-                        <!-- <p>Посетил: {req.Attended__c ? 'Да' : 'Нет'}</p> -->
-                    </div>
-                    <div>
-                        <template lwc:if={req.isDeletable}>
-                            <lightning-button
-                                label="Удалить"
-                                data-id={req.Id}
-                                variant="destructive"
-                                onclick={handleDelete}
-                            >
-                            </lightning-button>
-                        </template>
-                        <template lwc:else>
-                            <lightning-button
-                                label="Удалить"
-                                data-id={req.Id}
-                                variant="destructive"
-                                onclick={handleDelete}
-                                disabled
-                            >
-                            </lightning-button>
-                        </template>
-                        
-                    </div>
-                </div>
-            </template>
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                <thead>
+                    <tr>
+                        <th>Мероприятие</th>
+                        <th>Дата</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template for:each={requests} for:item="req">
+                        <tr key={req.Id}>
+                            <td><strong>{req.Event__r.Name}</strong></td>
+                            <td>{req.Event__r.Event_DateTime__c}</td>
+                            <td>
+                                <template lwc:if={req.isDeletable}>
+                                    <lightning-button
+                                        label="Удалить"
+                                        data-id={req.Id}
+                                        variant="destructive"
+                                        onclick={handleDelete}
+                                    ></lightning-button>
+                                </template>
+                                <template lwc:else>
+                                    <lightning-button
+                                        label="Удалить"
+                                        data-id={req.Id}
+                                        variant="destructive"
+                                        onclick={handleDelete}
+                                        disabled
+                                    ></lightning-button>
+                                </template>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
         </div>
     </template>
 
