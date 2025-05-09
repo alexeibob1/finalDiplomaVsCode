@@ -67,7 +67,8 @@ export default class EventRequestForm extends LightningElement {
         const result = await ConfirmationModal.open({
             size: 'medium',
             title: 'Подтверждение заявки',
-            message: `Вы уверены, что хотите записаться на мероприятие "${selected.Name}"?`,
+            message: `Вы уверены, что хотите записаться на мероприятие "${selected.Name}"? ` + 
+                (!this.isDeletable(selected.Event_DateTime__c) ? 'До мероприятия осталось меньше суток, поэтому подаваемая заявка не сможет быть отменена.' : ''),
             confirmLabel: 'Подтвердить',
             cancelLabel: 'Отмена'
         });
@@ -84,6 +85,14 @@ export default class EventRequestForm extends LightningElement {
                 this.dispatchEvent(new CustomEvent('loading', { detail: { isLoading: false } }));
             }
         }
+    }
+
+    isDeletable(eventDate) {
+        const now = new Date();
+        const eventTime = new Date(eventDate);
+        const oneDayBefore = new Date(eventTime);
+        oneDayBefore.setDate(eventTime.getDate() - 1);
+        return now < oneDayBefore;
     }
 
     formatDateTime(dateStr) {
