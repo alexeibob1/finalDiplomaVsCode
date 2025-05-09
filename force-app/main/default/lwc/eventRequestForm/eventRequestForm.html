@@ -1,70 +1,48 @@
 <template>
-    <template if:true={error}>
-        <div class="slds-text-color_error slds-m-around_medium">
-            ⚠ {error}
-        </div>
-    </template>
+    <lightning-card title="Доступные мероприятия">
+        <template if:true={error}>
+            <div class="slds-text-color_error slds-m-around_medium">⚠ {error}</div>
+        </template>
 
-    <template if:true={events.length}>
-        <div class="slds-box slds-box_xx-small">
-            <table class="slds-table slds-table_cell-buffer slds-table_bordered">
-                <thead>
-                    <tr>
-                        <th>Название</th>
-                        <th>Место</th>
-                        <th>Дата</th>
-                        <th>Осталось мест</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <template for:each={events} for:item="event">
-                        <tr key={event.Id}>
-                            <td>{event.Name}</td>
-                            <td>{event.Event_Place__c}</td>
-                            <td>{event.Event_DateTime__c}</td>
-                            <td>{event.Remaining_Spaces__c}</td>
-                            <td>
-                                <template lwc:if={event.isActive}>
-                                    <lightning-button
-                                        label="Записаться"
-                                        data-id={event.Id}
-                                        variant="brand"
-                                        onclick={handleSubmit}
-                                    ></lightning-button>
-                                </template>
-                                <template lwc:else>
-                                    <lightning-button
-                                        label="Записаться"
-                                        data-id={event.Id}
-                                        variant="brand"
-                                        onclick={handleSubmit}
-                                        disabled
-                                    ></lightning-button>
-                                </template>
-                            </td>
+        <template if:true={events.length}>
+            <div class="custom-table slds-scrollable_x">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                    <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Место</th>
+                            <th>Дата и время</th>
+                            <th>Осталось мест</th>
+                            <th></th>
                         </tr>
-                    </template>
-                </tbody>
-            </table>
-
-            <div class="slds-m-top_medium slds-grid slds-grid_align-center">
-                <lightning-button 
-                    label="Назад" 
-                    onclick={prevPage}
-                    disabled={isFirstPage}
-                    class="slds-m-right_small">
-                </lightning-button>
-                <lightning-button 
-                    label="Вперёд" 
-                    onclick={nextPage}
-                    disabled={isLastPage}>
-                </lightning-button>
+                    </thead>
+                    <tbody>
+                        <template for:each={events} for:item="event">
+                            <tr key={event.Id}>
+                                <td>{event.Name}</td>
+                                <td>{event.Event_Place__c}</td>
+                                <td>{event.formattedDate}</td>
+                                <td>{event.Remaining_Spaces__c}</td>
+                                <td>
+                                    <lightning-button
+                                        label="Записаться"
+                                        data-id={event.Id}
+                                        variant="brand"
+                                        onclick={handleSubmit}
+                                        disabled={event.buttonDisabled}>
+                                    </lightning-button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
             </div>
-        </div>
-    </template>
+        </template>
 
-    <template if:false={events.length}>
-        <p class="slds-text-align_center slds-m-top_medium">Нет доступных мероприятий</p>
-    </template>
+        <template if:false={events.length}>
+            <div class="slds-align_absolute-center slds-m-around_medium">
+                <p class="slds-text-body_regular">Нет доступных мероприятий.</p>
+            </div>
+        </template>
+    </lightning-card>
 </template>

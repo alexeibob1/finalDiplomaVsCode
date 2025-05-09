@@ -1,8 +1,9 @@
+// Apex Controller: EventController
 public with sharing class EventController {
-    
     public class EventResult {
         @AuraEnabled public List<Event__c> events {get; set; }
         @AuraEnabled public Integer total {get; set; }
+        @AuraEnabled public List<Id> existingEventIds { get; set; }
     }
 
     @AuraEnabled
@@ -27,18 +28,39 @@ public with sharing class EventController {
             SELECT COUNT()
             FROM Event__c
             WHERE Dormitory__c = :student.Room__r.Dormitory__c
-              AND Event_DateTime__c > TODAY
+            //   AND Event_DateTime__c > TODAY
         ];
+
+        List<Event_Request__c> studentRequests = [
+            SELECT Event__c FROM Event_Request__c
+            WHERE Student_Contact__c = :student.Id
+        ];
+
+        Set<Id> requestedEventIds = new Set<Id>();
+        for (Event_Request__c req : studentRequests) {
+            requestedEventIds.add(req.Event__c);
+        }
 
         EventResult result = new EventResult();
         result.events = events;
         result.total = totalCount;
+        result.existingEventIds = new List<Id>(requestedEventIds);
         return result;
     }
 
     @AuraEnabled
     public static void createEventRequest(Id eventId) {
         Contact student = StudentDAO.getCurrentUserContact();
+
+        Boolean exists = [
+            SELECT COUNT() FROM Event_Request__c
+            WHERE Student_Contact__c = :student.Id AND Event__c = :eventId
+        ] > 0;
+
+        if (exists) {
+            throw new AuraHandledException('Вы уже подали заявку на это мероприятие.');
+        }
+
         Event_Request__c req = new Event_Request__c(
             Event__c = eventId,
             Student_Contact__c = student.Id

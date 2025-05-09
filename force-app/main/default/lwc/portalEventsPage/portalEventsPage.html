@@ -9,13 +9,14 @@
         <lightning-layout-item size="12" class="slds-m-bottom_medium">
             <c-event-request-form
                 onloading={handleLoading}
-                onrequestcreated={handleRequestCreated}>
+                onrefreshrequests={handleRequestRefresh}>
             </c-event-request-form>
         </lightning-layout-item>
 
         <lightning-layout-item size="12">
             <c-student-event-requests-list
-                onloading={handleLoading}>
+                onloading={handleLoading}
+                onrefreshrequests={handleRequestRefresh}>
             </c-student-event-requests-list>
         </lightning-layout-item>
     </lightning-layout>

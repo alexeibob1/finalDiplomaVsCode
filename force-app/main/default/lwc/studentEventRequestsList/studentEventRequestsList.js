@@ -9,56 +9,54 @@ export default class StudentEventRequestsList extends LightningElement {
     @track error;
 
     connectedCallback() {
-        this.fetchRequests();
+        this.loadRequests();
     }
 
     @api
-    async fetchRequests() {
-        this.dispatchEvent(new CustomEvent('loading', { detail: { isLoading: true } }));
+    async loadRequests() {
         try {
             const result = await getStudentEventRequests();
-            this.requests = result.map(req => ({
-                ...req,
-                isDeletable: this.isDeletable(req.Event__r?.Event_DateTime__c)
+            this.requests = result.map(item => ({
+                ...item,
+                formattedDate: this.formatDateTime(item.Event__r.Event_DateTime__c)
             }));
             this.error = null;
-        } catch (err) {
-            this.requests = [];
-            this.error = err.body?.message || 'Ошибка загрузки заявок';
-        } finally {
-            this.dispatchEvent(new CustomEvent('loading', { detail: { isLoading: false } }));
+        } catch (e) {
+            console.error(e);
+            this.error = 'Ошибка при загрузке заявок';
         }
     }
 
-    isDeletable(eventDate) {
-        const now = new Date();
-        const eventTime = new Date(eventDate);
-        const oneDayBefore = new Date(eventTime);
-        oneDayBefore.setDate(eventTime.getDate() - 1);
-        return now < oneDayBefore;
-    }
-
     async handleDelete(event) {
-        const requestId = event.currentTarget.dataset.id;
+        const recordId = event.currentTarget.dataset.id;
 
-        const result = await ConfirmationModal.open({
-            title: 'Удалить заявку?',
-            message: 'Вы уверены, что хотите удалить эту заявку?',
+        const confirmed = await ConfirmationModal.open({
+            title: 'Удалить заявку',
+            message: 'Вы уверены, что хотите удалить заявку?',
             confirmLabel: 'Удалить',
             cancelLabel: 'Отмена'
         });
 
-        if (result) {
-            this.dispatchEvent(new CustomEvent('loading', { detail: { isLoading: true } }));
+        if (confirmed) {
             try {
-                await deleteEventRequest({ requestId });
-                Toast.show({ label: 'Удалено', message: 'Заявка удалена', variant: 'success' });
-                this.fetchRequests();
-            } catch (err) {
+                await deleteEventRequest({ requestId: recordId });
+                Toast.show({ label: 'Успешно', message: 'Заявка удалена', variant: 'success' });
+                this.dispatchEvent(new CustomEvent('refreshrequests'));
+            } catch (e) {
+                console.error(e);
                 Toast.show({ label: 'Ошибка', message: 'Не удалось удалить заявку', variant: 'error' });
-            } finally {
-                this.dispatchEvent(new CustomEvent('loading', { detail: { isLoading: false } }));
             }
         }
+    }
+
+    formatDateTime(dateStr) {
+        const date = new Date(dateStr);
+        return new Intl.DateTimeFormat('ru-RU', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }).format(date);
     }
 }

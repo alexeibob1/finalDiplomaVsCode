@@ -7,10 +7,15 @@ export default class PortalEventsPage extends LightningElement {
         this.isLoading = event.detail.isLoading;
     }
 
-    handleRequestCreated() {
+    handleRequestRefresh() {
         const list = this.template.querySelector('c-student-event-requests-list');
-        if (list) {
-            list.fetchRequests();
+        const form = this.template.querySelector('c-event-request-form');
+
+        if (list?.loadRequests) {
+            list.loadRequests();
+        }
+        if (form?.loadEvents) {
+            form.loadEvents();
         }
     }
 }
