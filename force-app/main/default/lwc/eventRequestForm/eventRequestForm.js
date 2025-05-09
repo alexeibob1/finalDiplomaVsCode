@@ -2,6 +2,7 @@ import { LightningElement, track, api } from 'lwc';
 import getAvailableEventsForStudent from '@salesforce/apex/EventController.getAvailableEventsForStudent';
 import createEventRequest from '@salesforce/apex/EventController.createEventRequest';
 import Toast from 'lightning/toast';
+import ConfirmationModal from 'c/confirmationModal';
 
 const PAGE_SIZE = 10;
 
@@ -37,15 +38,27 @@ export default class EventRequestForm extends LightningElement {
 
     async handleSubmit(event) {
         const eventId = event.currentTarget.dataset.id;
+        const selected = this.events.find(e => e.Id === eventId);
 
-        try {
-            await createEventRequest({ eventId });
-            Toast.show({ label: 'Успешно', message: 'Заявка отправлена', variant: 'success' });
-            // this.loadEvents(); // Refetch to disable button
-            this.dispatchEvent(new CustomEvent('refreshrequests'));
-        } catch (e) {
-            console.error(e);
-            Toast.show({ label: 'Ошибка', message: e.body?.message || 'Не удалось отправить заявку', variant: 'error' });
+        const result = await ConfirmationModal.open({
+            size: 'medium',
+            title: 'Подтверждение заявки',
+            message: `Вы уверены, что хотите записаться на мероприятие "${selected.Name}"?`,
+            confirmLabel: 'Подтвердить',
+            cancelLabel: 'Отмена'
+        });
+
+        if (result) {
+            this.dispatchEvent(new CustomEvent('loading', { detail: { isLoading: true } }));
+            try {
+                await createEventRequest({ eventId });
+                Toast.show({ label: 'Успешно', message: 'Заявка отправлена', variant: 'success' });
+                this.dispatchEvent(new CustomEvent('refreshrequests'));
+            } catch (e) {
+                Toast.show({ label: 'Ошибка', message: 'Не удалось отправить заявку', variant: 'error' });
+            } finally {
+                this.dispatchEvent(new CustomEvent('loading', { detail: { isLoading: false } }));
+            }
         }
     }
 

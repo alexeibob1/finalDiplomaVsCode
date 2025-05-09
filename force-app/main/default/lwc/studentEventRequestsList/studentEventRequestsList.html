@@ -20,13 +20,23 @@
                                 <td>{item.Event__r.Name}</td>
                                 <td>{item.formattedDate}</td>
                                 <td>
-                                    <lightning-button 
-                                        variant="destructive" 
-                                        icon-name="utility:delete"
-                                        title="Удалить"
-                                        onclick={handleDelete}
-                                        data-id={item.Id}>
-                                    </lightning-button>
+                                    <template lwc:if={item.isDeletable}>
+                                        <lightning-button
+                                            label="Удалить"
+                                            data-id={item.Id}
+                                            variant="destructive"
+                                            onclick={handleDelete}
+                                        ></lightning-button>
+                                    </template>
+                                    <template lwc:else>
+                                        <lightning-button
+                                            label="Удалить"
+                                            data-id={item.Id}
+                                            variant="destructive"
+                                            onclick={handleDelete}
+                                            disabled
+                                        ></lightning-button>
+                                    </template>
                                 </td>
                             </tr>
                         </template>

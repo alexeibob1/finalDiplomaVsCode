@@ -19,7 +19,7 @@ public with sharing class EventController {
             SELECT Id, Name, Event_DateTime__c, Max_Students__c, Remaining_Spaces__c, Event_Place__c
             FROM Event__c
             WHERE Dormitory__c = :student.Room__r.Dormitory__c
-            //   AND Event_DateTime__c > TODAY
+              AND Event_DateTime__c > :System.now()
             ORDER BY Event_DateTime__c ASC
             LIMIT :pageSize OFFSET :offsetVal
         ];
@@ -28,7 +28,7 @@ public with sharing class EventController {
             SELECT COUNT()
             FROM Event__c
             WHERE Dormitory__c = :student.Room__r.Dormitory__c
-            //   AND Event_DateTime__c > TODAY
+              AND Event_DateTime__c > :System.now()
         ];
 
         List<Event_Request__c> studentRequests = [
@@ -74,7 +74,7 @@ public with sharing class EventController {
         return [
             SELECT Id, Name, Event__r.Name, Event__r.Event_DateTime__c, Attended__c
             FROM Event_Request__c
-            WHERE Student_Contact__c = :student.Id
+            WHERE Student_Contact__c = :student.Id AND Event__r.Event_DateTime__c > :System.now()
             ORDER BY Event__r.Event_DateTime__c DESC
         ];
     }

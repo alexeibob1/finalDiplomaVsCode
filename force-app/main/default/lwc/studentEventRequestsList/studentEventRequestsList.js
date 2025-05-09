@@ -18,13 +18,22 @@ export default class StudentEventRequestsList extends LightningElement {
             const result = await getStudentEventRequests();
             this.requests = result.map(item => ({
                 ...item,
-                formattedDate: this.formatDateTime(item.Event__r.Event_DateTime__c)
+                formattedDate: this.formatDateTime(item.Event__r.Event_DateTime__c),
+                isDeletable: this.isDeletable(item.Event__r?.Event_DateTime__c)
             }));
             this.error = null;
         } catch (e) {
             console.error(e);
             this.error = 'Ошибка при загрузке заявок';
         }
+    }
+
+    isDeletable(eventDate) {
+        const now = new Date();
+        const eventTime = new Date(eventDate);
+        const oneDayBefore = new Date(eventTime);
+        oneDayBefore.setDate(eventTime.getDate() - 1);
+        return now < oneDayBefore;
     }
 
     async handleDelete(event) {
