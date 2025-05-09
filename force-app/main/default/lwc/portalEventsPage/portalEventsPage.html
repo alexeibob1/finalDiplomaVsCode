@@ -13,11 +13,16 @@
             </c-event-request-form>
         </lightning-layout-item>
 
-        <lightning-layout-item size="12">
+        <lightning-layout-item size="12" class="slds-m-bottom_medium">
             <c-student-event-requests-list
                 onloading={handleLoading}
                 onrefreshrequests={handleRequestRefresh}>
             </c-student-event-requests-list>
+        </lightning-layout-item>
+
+        <lightning-layout-item size="12" class="slds-m-bottom_medium">
+            <c-attended-event-list>
+            </c-attended-event-list>
         </lightning-layout-item>
     </lightning-layout>
 </template>

@@ -11,6 +11,7 @@
                         <tr>
                             <th>Мероприятие</th>
                             <th>Дата и время</th>
+                            <th>Место</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -19,6 +20,7 @@
                             <tr key={item.Id}>
                                 <td>{item.Event__r.Name}</td>
                                 <td>{item.formattedDate}</td>
+                                <td>{item.Event__r.Event_Place__c}</td>
                                 <td>
                                     <lightning-button
                                         label="Удалить"
