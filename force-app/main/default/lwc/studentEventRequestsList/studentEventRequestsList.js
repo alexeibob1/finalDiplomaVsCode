@@ -19,7 +19,7 @@ export default class StudentEventRequestsList extends LightningElement {
             this.requests = result.map(item => ({
                 ...item,
                 formattedDate: this.formatDateTime(item.Event__r.Event_DateTime__c),
-                isDeletable: this.isDeletable(item.Event__r?.Event_DateTime__c)
+                isDisabled: !this.isDeletable(item.Event__r?.Event_DateTime__c)
             }));
             this.error = null;
         } catch (e) {
@@ -54,6 +54,7 @@ export default class StudentEventRequestsList extends LightningElement {
             } catch (e) {
                 console.error(e);
                 Toast.show({ label: 'Ошибка', message: 'Не удалось удалить заявку', variant: 'error' });
+                this.dispatchEvent(new CustomEvent('refreshrequests'));
             }
         }
     }
