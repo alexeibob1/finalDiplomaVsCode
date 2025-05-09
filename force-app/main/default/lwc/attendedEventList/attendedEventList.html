@@ -1,0 +1,43 @@
+<template>
+    <lightning-card title="Посещённые мероприятия">
+        <template if:true={error}>
+            <div class="slds-text-color_error slds-m-around_medium">⚠ {error}</div>
+        </template>
+
+        <template if:true={requests.length}>
+            <div class="custom-table slds-scrollable_x">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                    <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Место</th>
+                            <th>Дата и время</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={requests} for:item="req">
+                            <tr key={req.Id}>
+                                <td>{req.Event__r.Name}</td>
+                                <td>{req.Event__r.Event_Place__c}</td>
+                                <td>{req.formattedDate}</td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="slds-m-top_medium slds-align_absolute-center">
+                <lightning-button-group>
+                    <lightning-button label="Назад" onclick={handlePrev} disabled={disablePrev}></lightning-button>
+                    <lightning-button label="Вперёд" onclick={handleNext} disabled={disableNext}></lightning-button>
+                </lightning-button-group>
+            </div>
+        </template>
+
+        <template if:false={requests.length}>
+            <div class="slds-align_absolute-center slds-m-around_medium">
+                <p class="slds-text-body_regular">Нет посещённых мероприятий.</p>
+            </div>
+        </template>
+    </lightning-card>
+</template>

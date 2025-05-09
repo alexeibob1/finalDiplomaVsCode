@@ -81,6 +81,45 @@ public with sharing class EventController {
 
     @AuraEnabled
     public static void deleteEventRequest(Id requestId) {
-        delete [SELECT Id FROM Event_Request__c WHERE Id = :requestId];
+        Event_Request__c request = [
+            SELECT Id, Event__r.Event_DateTime__c
+            FROM Event_Request__c
+            WHERE Id = :requestId
+            LIMIT 1
+        ];
+
+        DateTime eventDateTime = request.Event__r.Event_DateTime__c;
+        DateTime now = System.now();
+
+        if (eventDateTime.addDays(-1) <= now) {
+            throw new AuraHandledException('Невозможно удалить заявку менее чем за сутки до начала мероприятия.');
+        }
+
+        delete request;
     }
+
+    @AuraEnabled
+    public static Map<String, Object> getAttendedEvents(Integer pageSize, Integer pageNumber) {
+        Contact student = StudentDAO.getCurrentUserContact();
+        
+        List<Event_Request__c> attendedRequests = [
+            SELECT Id, Event__r.Name, Event__r.Event_DateTime__c, Event__r.Event_Place__c
+            FROM Event_Request__c
+            WHERE Attended__c = true AND Student_Contact__c = :student.Id
+            ORDER BY Event__r.Event_DateTime__c DESC
+            LIMIT :pageSize OFFSET :((pageNumber - 1) * pageSize)
+        ];
+
+        Integer total = [
+            SELECT COUNT()
+            FROM Event_Request__c
+            WHERE Attended__c = true AND Student_Contact__c = :student.Id
+        ];
+
+        return new Map<String, Object>{
+            'events' => attendedRequests,
+            'total' => total
+        };
+    }
+
 }
