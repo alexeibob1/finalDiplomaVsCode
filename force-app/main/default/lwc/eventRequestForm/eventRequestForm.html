@@ -36,6 +36,20 @@
                         </template>
                     </tbody>
                 </table>
+
+                <div class="slds-m-top_medium slds-grid slds-grid_align-center">
+                    <lightning-button 
+                        label="Назад" 
+                        onclick={prevPage}
+                        disabled={isFirstPage}
+                        class="slds-m-right_small">
+                    </lightning-button>
+                    <lightning-button 
+                        label="Вперёд" 
+                        onclick={nextPage}
+                        disabled={isLastPage}>
+                    </lightning-button>
+                </div>
             </div>
         </template>
 

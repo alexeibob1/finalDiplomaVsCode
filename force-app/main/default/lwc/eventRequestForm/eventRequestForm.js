@@ -9,6 +9,30 @@ const PAGE_SIZE = 10;
 export default class EventRequestForm extends LightningElement {
     @track events = [];
     @track error;
+    @track currentPage = 1;
+    @track total = 0;
+
+    get isFirstPage() {
+        return this.currentPage === 1;
+    }
+
+    get isLastPage() {
+        return this.currentPage * PAGE_SIZE >= this.total;
+    }
+
+    nextPage() {
+        if (!this.isLastPage) {
+            this.currentPage++;
+            this.fetchEvents();
+        }
+    }
+
+    prevPage() {
+        if (!this.isFirstPage) {
+            this.currentPage--;
+            this.fetchEvents();
+        }
+    }
 
     connectedCallback() {
         this.loadEvents();
