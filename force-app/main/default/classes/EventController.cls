@@ -74,8 +74,8 @@ public with sharing class EventController {
         return [
             SELECT Id, Name, Event__r.Name, Event__r.Event_DateTime__c, Attended__c, Event__r.Event_Place__c
             FROM Event_Request__c
-            WHERE Student_Contact__c = :student.Id AND Event__r.Event_DateTime__c > :System.now()
-            ORDER BY Event__r.Event_DateTime__c DESC
+            WHERE Student_Contact__c = :student.Id AND Event__r.Event_DateTime__c > :System.now() AND Attended__c = FALSE
+            ORDER BY Event__r.Event_DateTime__c ASC
         ];
     }
 

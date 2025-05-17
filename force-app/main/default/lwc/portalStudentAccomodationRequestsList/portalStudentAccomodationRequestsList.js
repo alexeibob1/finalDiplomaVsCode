@@ -47,6 +47,7 @@ export default class PortalStudentAccomodationRequestsList extends LightningElem
         this.fetchRequests();
     }
 
+    @api
     async fetchRequests() {
         this.dispatchEvent(new CustomEvent('loading', { detail: { isLoading: true } }));
 
